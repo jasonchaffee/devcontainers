@@ -154,6 +154,22 @@ devcontainer up --workspace-folder .
    ```
 3. Open in VS Code/Cursor → "Reopen in Container"
 
+### Testing in JetBrains IDEs
+
+JetBrains IDEs (IntelliJ IDEA, PyCharm, WebStorm, etc.) support dev containers via JetBrains Gateway:
+
+1. Install [JetBrains Gateway](https://www.jetbrains.com/remote-development/gateway/)
+2. Copy `templates/java/devcontainer.json` to your project's `.devcontainer/` folder
+3. Open JetBrains Gateway → "New Project" → "Dev Containers"
+4. Select your project folder and the IDE to use
+5. Gateway will build the container and connect your IDE
+
+Alternatively, use the **Dev Containers plugin** directly in your JetBrains IDE:
+
+1. Install the "Dev Containers" plugin from Settings → Plugins
+2. Open your project with `.devcontainer/devcontainer.json`
+3. Click the notification to "Reopen in Dev Container" or use File → Remote Development → Dev Containers
+
 ### Creating a New Template
 
 1. Create `templates/<name>/devcontainer-template.json` with metadata
