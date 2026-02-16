@@ -165,13 +165,11 @@ devcontainer features test -f modern-cli -p features/
 
 ### Testing Templates
 
-Generate a project from the template:
+For local template testing, copy the template files directly:
 
 ```bash
-devcontainer templates apply \
-  --template-id java \
-  --template-path templates/ \
-  --workspace-folder ./test-project
+mkdir -p test-project/.devcontainer
+cp templates/java/devcontainer.json test-project/.devcontainer/
 ```
 
 Build and run the container:
@@ -181,6 +179,8 @@ cd test-project
 devcontainer build --workspace-folder .
 devcontainer up --workspace-folder .
 ```
+
+Or test in VS Code/Cursor by opening `test-project` and using "Reopen in Container".
 
 ### Testing in VS Code/Cursor
 
