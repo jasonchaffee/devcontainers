@@ -1,0 +1,24 @@
+# =============================================================================
+# JCF Dev Container - .gitignore
+# =============================================================================
+
+# IDE settings (personalization - not shared)
+.idea/
+.vscode/
+*.iml
+
+# Claude settings - local only (API keys, personal preferences)
+# Team settings go in .claude/settings.json (committed)
+.claude/settings.local.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker build artifacts
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*~

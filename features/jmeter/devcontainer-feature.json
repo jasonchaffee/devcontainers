@@ -1,0 +1,22 @@
+{
+  "id": "jmeter",
+  "version": "1.0.0",
+  "name": "Apache JMeter",
+  "description": "Installs Apache JMeter for load testing and performance measurement.",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/jmeter",
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/java:1": {}
+  },
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "5.6.3",
+      "description": "JMeter version to install"
+    },
+    "installPluginsManager": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install JMeter Plugins Manager for easy plugin installation"
+    }
+  }
+}

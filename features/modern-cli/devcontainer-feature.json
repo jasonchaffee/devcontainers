@@ -1,0 +1,57 @@
+{
+  "id": "modern-cli",
+  "version": "1.0.0",
+  "name": "Modern CLI Tools",
+  "description": "Modern replacements for standard Unix tools: bat (cat), eza (ls), fd (find), ripgrep (grep), zoxide (cd), delta (diff), fzf (fuzzy finder), yq (YAML processor)",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/modern-cli",
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "options": {
+    "installBat": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install bat (cat replacement with syntax highlighting)"
+    },
+    "installEza": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install eza (modern ls replacement)"
+    },
+    "installFd": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install fd (fast find alternative)"
+    },
+    "installRipgrep": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install ripgrep (fast grep alternative)"
+    },
+    "installZoxide": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install zoxide (smarter cd command)"
+    },
+    "installDelta": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install delta (git diff pager)"
+    },
+    "installColordiff": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install colordiff (colorized diff)"
+    },
+    "installFzf": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install fzf (fuzzy finder)"
+    },
+    "installYq": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install yq (YAML processor)"
+    }
+  }
+}

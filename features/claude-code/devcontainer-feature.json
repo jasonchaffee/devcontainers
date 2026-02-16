@@ -1,0 +1,22 @@
+{
+  "id": "claude-code",
+  "version": "1.0.0",
+  "name": "Claude Code CLI",
+  "description": "Installs the Claude Code CLI for AI-assisted development using the native installer.",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/claude-code",
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "options": {
+    "install": {
+      "type": "boolean",
+      "default": true,
+      "description": "Set to false to skip installation"
+    },
+    "installStatusLine": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install status line feature for terminal"
+    }
+  }
+}

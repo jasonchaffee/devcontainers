@@ -1,0 +1,22 @@
+{
+  "id": "antidote",
+  "version": "1.0.0",
+  "name": "Antidote Zsh Plugin Manager",
+  "description": "Installs Antidote, a fast Zsh plugin manager. Lighter and faster than Oh My Zsh.",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/antidote",
+  "options": {
+    "installZsh": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install Zsh if not present"
+    },
+    "setDefaultShell": {
+      "type": "boolean",
+      "default": false,
+      "description": "Set Zsh as the default shell for the remote user"
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils"
+  ]
+}

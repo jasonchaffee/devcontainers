@@ -1,0 +1,44 @@
+{
+  "name": "jasonchaffee-claude-statusline",
+  "description": "Emoji-rich status line with model icons (🧠 Opus, ⚡ Sonnet, 🚀 Haiku), directory, git branch/status indicators matching zsh theme (✚✹✖➜═✭), and color-coded context usage (🟢🟡🟠🔴).",
+  "author": "Jason Chaffee",
+  "version": "1.0.0",
+  "repository": "https://github.com/jasonchaffee/devcontainers",
+  "examples": [
+    "⚡ Sonnet 4 | 📁 devcontainers | 🏠 main | 🟢 23% (46,000/200,000)",
+    "⚡ Sonnet 4 | 📁 devcontainers | 🌿 feature/auth ✹✭ | 🟡 58% (116,000/200,000)",
+    "🧠 Opus 4 | 📁 my-project | 🌿 fix/bug-123 ✚✹✖✭ | 🟠 82% (164,000/200,000)"
+  ],
+  "icons": {
+    "models": {
+      "opus": "🧠",
+      "sonnet": "⚡",
+      "haiku": "🚀",
+      "default": "🤖"
+    },
+    "directory": "📁",
+    "branches": {
+      "main": "🏠",
+      "feature": "🌿"
+    },
+    "git_status": {
+      "added": "✚",
+      "modified": "✹",
+      "deleted": "✖",
+      "renamed": "➜",
+      "unmerged": "═",
+      "untracked": "✭"
+    },
+    "context": {
+      "healthy": "🟢 (0-50%)",
+      "caution": "🟡 (50-75%)",
+      "warning": "🟠 (75-90%)",
+      "critical": "🔴 (90%+)"
+    }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "python3 ~/.claude/scripts/jasonchaffee-statusline.py",
+    "padding": 0
+  }
+}

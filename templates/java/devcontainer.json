@@ -1,0 +1,331 @@
+{
+  // ==========================================================================
+  // Java Dev Container Template
+  // ==========================================================================
+  // Generated from template options. Customize as needed.
+  //
+  // See: https://containers.dev/implementors/json_reference/
+  // ==========================================================================
+
+  "name": "Java Development",
+
+  // --------------------------------------------------------------------------
+  // Image Configuration
+  // --------------------------------------------------------------------------
+  // Option 1: Use pre-built image (faster startup, recommended for teams)
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  // Option 2: Build from Dockerfile in this directory
+  // "build": {
+  //   "dockerfile": "Dockerfile",
+  //   "context": ".."
+  // },
+
+  // --------------------------------------------------------------------------
+  // Workspace
+  // --------------------------------------------------------------------------
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/workspace",
+
+  // --------------------------------------------------------------------------
+  // User Configuration
+  // --------------------------------------------------------------------------
+  "remoteUser": "vscode",
+  "containerUser": "vscode",
+
+  // --------------------------------------------------------------------------
+  // Features
+  // --------------------------------------------------------------------------
+  // Note: Template options (see devcontainer-template.json) control defaults.
+  // Comment/uncomment features below to customize your environment.
+  // --------------------------------------------------------------------------
+  "features": {
+    // =========================================================================
+    // Core (always included)
+    // =========================================================================
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "vscode",
+      "configureZshAsDefaultShell": true
+    },
+
+    // =========================================================================
+    // Java (core language)
+    // =========================================================================
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "${templateOption:javaVersion}",
+      "jdkDistro": "${templateOption:jdkDistro}",
+      "installMaven": "${templateOption:installMaven}",
+      "installGradle": "${templateOption:installGradle}"
+    },
+
+    // =========================================================================
+    // Languages
+    // =========================================================================
+    "ghcr.io/devcontainers/features/node:1": {},
+
+    // =========================================================================
+    // Optional: Python (installPython: false)
+    // =========================================================================
+    // "ghcr.io/devcontainers/features/python:1": {},
+
+    // =========================================================================
+    // Tools (installXxx: true)
+    // =========================================================================
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+
+    // =========================================================================
+    // Custom features (default: true)
+    // When published: ghcr.io/jasonchaffee/devcontainers/<name>:1
+    // =========================================================================
+    "ghcr.io/jasonchaffee/devcontainers/antidote:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/modern-cli:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/shell-dev:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/http-tools:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/terminal-extras:1": {},
+
+    // =========================================================================
+    // Optional: Kubernetes (installKubernetes: false)
+    // =========================================================================
+    // "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {}
+
+    // =========================================================================
+    // Optional: Terraform (installTerraform: false)
+    // =========================================================================
+    // "ghcr.io/devcontainers/features/terraform:1": {}
+
+    // =========================================================================
+    // Optional: Google Cloud (installGcloud: false)
+    // =========================================================================
+    // "ghcr.io/jasonchaffee/devcontainers/gcloud-cli:1": {}
+
+    // =========================================================================
+    // Optional: Spring Boot (installSpring: false)
+    // =========================================================================
+    // "ghcr.io/jasonchaffee/devcontainers/spring:1": {}
+
+    // =========================================================================
+    // Optional: JMeter (installJmeter: false)
+    // =========================================================================
+    // "ghcr.io/jasonchaffee/devcontainers/jmeter:1": {}
+
+    // =========================================================================
+    // JetBrains (installJetBrains: true)
+    // =========================================================================
+    "ghcr.io/jasonchaffee/devcontainers/jetbrains:1": {},
+
+    // =========================================================================
+    // AI Tools (install controlled by template options)
+    // =========================================================================
+    "ghcr.io/jasonchaffee/devcontainers/claude-code:1": {
+      "install": "${templateOption:installClaudeCode}",
+      "installStatusLine": true
+    },
+    "ghcr.io/jasonchaffee/devcontainers/codex:1": {
+      "install": "${templateOption:installCodex}"
+    },
+    "ghcr.io/jasonchaffee/devcontainers/gemini-cli:1": {
+      "install": "${templateOption:installGemini}"
+    }
+
+    // =========================================================================
+    // Optional: GitHub Copilot CLI (installCopilot: false)
+    // Note: Official feature - no install flag, must uncomment manually
+    // =========================================================================
+    // "ghcr.io/devcontainers/features/copilot-cli:1": {}
+  },
+
+  // --------------------------------------------------------------------------
+  // Mounts - Bind host files/directories into container
+  // --------------------------------------------------------------------------
+  // IMPORTANT: Bind mounts FAIL if source doesn't exist!
+  // - Directories: Docker creates empty dir on host (owned by root)
+  // - Files: Container fails to start
+  //
+  // Review the OPTIONAL section below and REMOVE any mounts for files you
+  // don't have on your system.
+  // --------------------------------------------------------------------------
+  "mounts": [
+    // =========================================================================
+    // REQUIRED - Most devs have these
+    // =========================================================================
+
+    // Git (needed for commits and push/pull)
+    "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+
+    // Build caches (speeds up builds significantly)
+    "source=${localEnv:HOME}/.m2,target=/home/vscode/.m2,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.gradle,target=/home/vscode/.gradle,type=bind,consistency=cached",
+
+    // Named volumes (always work, no host file needed)
+    "source=${localWorkspaceFolderBasename}-target,target=/workspace/target,type=volume",
+    "source=${localWorkspaceFolderBasename}-shellhistory,target=/commandhistory,type=volume",
+
+    // =========================================================================
+    // RECOMMENDED - Remove if you don't have these directories
+    // =========================================================================
+
+    // GitHub CLI auth
+    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached",
+
+    // AI Tools - remove lines for tools you don't use
+    "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.codex,target=/home/vscode/.codex,type=bind,consistency=cached",
+    // "source=${localEnv:HOME}/.gemini,target=/home/vscode/.gemini,type=bind,consistency=cached",
+
+    // Cloud credentials
+    "source=${localEnv:HOME}/.config/gcloud,target=/home/vscode/.config/gcloud,type=bind,consistency=cached",
+
+    // =========================================================================
+    // OPTIONAL - Remove if files don't exist on your system
+    // =========================================================================
+
+    // Cursor IDE settings
+    "source=${localEnv:HOME}/.cursor,target=/home/vscode/.cursor,type=bind,consistency=cached",
+
+    // Zsh configuration - uncomment what you have
+    "source=${localEnv:HOME}/.zshrc,target=/home/vscode/.zshrc,type=bind,consistency=cached",
+    // "source=${localEnv:HOME}/.zshenv,target=/home/vscode/.zshenv,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.zprofile,target=/home/vscode/.zprofile,type=bind,consistency=cached",
+    // "source=${localEnv:HOME}/.zsh,target=/home/vscode/.zsh,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.zsh_plugins.txt,target=/home/vscode/.zsh_plugins.txt,type=bind,consistency=cached",
+
+    // Vim configuration
+    "source=${localEnv:HOME}/.vimrc,target=/home/vscode/.vimrc,type=bind,consistency=cached"
+    // "source=${localEnv:HOME}/.vim,target=/home/vscode/.vim,type=bind,consistency=cached"
+  ],
+
+  // --------------------------------------------------------------------------
+  // Environment Variables
+  // --------------------------------------------------------------------------
+  "remoteEnv": {
+    // =========================================================================
+    // AI Tools
+    // =========================================================================
+    // Claude Code
+    "ANTHROPIC_BASE_URL": "${localEnv:ANTHROPIC_BASE_URL}",
+    "ANTHROPIC_AUTH_TOKEN": "${localEnv:ANTHROPIC_AUTH_TOKEN}",
+    "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}",
+    "DISABLE_AUTOUPDATER": "1",
+
+    // Gemini CLI
+    "GOOGLE_API_KEY": "${localEnv:GOOGLE_API_KEY}",
+    "GOOGLE_CLOUD_PROJECT": "${localEnv:GOOGLE_CLOUD_PROJECT}",
+
+    // GitHub token for gh CLI and Copilot
+    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
+  },
+
+  // --------------------------------------------------------------------------
+  // Port Forwarding
+  // --------------------------------------------------------------------------
+  "forwardPorts": [
+    8080,
+    5005
+  ],
+
+  "portsAttributes": {
+    "8080": {
+      "label": "Web App",
+      "onAutoForward": "notify"
+    },
+    "5005": {
+      "label": "Java Debug",
+      "onAutoForward": "silent"
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // Lifecycle Commands
+  // --------------------------------------------------------------------------
+  // Runs on host BEFORE container starts - create directories to avoid root ownership issues
+  "initializeCommand": "mkdir -p ~/.m2 ~/.gradle ~/.claude ~/.codex ~/.gemini ~/.config/gcloud ~/.config/gh",
+
+  // Runs ONCE after container creation
+  "postCreateCommand": "sudo mkdir -p ~/.cache && sudo chown -R $(whoami) ~/.cache && mkdir -p ~/.cache/zsh ~/.cache/zsh-utils && echo 'Dev container ready!'",
+
+  // Runs EVERY time container starts
+  "postStartCommand": "sudo chown -R vscode:vscode /commandhistory 2>/dev/null; touch /commandhistory/.zsh_history && ln -sf /commandhistory/.zsh_history ~/.zsh_history || true",
+
+  // --------------------------------------------------------------------------
+  // IDE Customizations
+  // --------------------------------------------------------------------------
+  "customizations": {
+    // VS Code and Cursor
+    "vscode": {
+      "extensions": [
+        // Java
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-gradle",
+        "vscjava.vscode-maven",
+        "redhat.java",
+
+        // Python (uncomment if installPython: true)
+        // "ms-python.python",
+        // "charliermarsh.ruff",
+
+        // Git
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        "donjayamanne.githistory",
+        "github.vscode-pull-request-github",
+
+        // Code quality
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "usernamehw.errorlens",
+        "streetsidesoftware.code-spell-checker",
+
+        // Infrastructure
+        "hashicorp.terraform",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker",
+
+        // Utilities
+        "gruntfuggly.todo-tree",
+        "alefragnani.project-manager",
+        "xyz.local-history",
+        "github.vscode-github-actions",
+
+        // AI Tools
+        "anthropic.claude-code",
+        "github.copilot",
+        "google.geminicodeassist"
+      ],
+      "settings": {
+        "java.configuration.updateBuildConfiguration": "automatic",
+        "editor.formatOnSave": true,
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
+    },
+    // JetBrains (IntelliJ IDEA, etc.)
+    // Note: Requires jetbrains feature for system dependencies
+    "jetbrains": {
+      "plugins": [
+        "com.intellij.spring",
+        "org.sonarlint.idea",
+        "org.jetbrains.plugins.github",
+        "Docker",
+        "org.jetbrains.kotlin",
+        "org.jetbrains.plugins.yaml",
+        "org.toml.lang",
+        "org.intellij.plugins.hcl",
+        "Lombook Plugin",
+        "GrepConsole",
+        "com.github.copilot",
+        "com.google.idea.geminicodeassist"
+      ]
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // Host Requirements (for cloud-hosted dev environments)
+  // --------------------------------------------------------------------------
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  }
+}

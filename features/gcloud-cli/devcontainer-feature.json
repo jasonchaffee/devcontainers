@@ -1,0 +1,20 @@
+{
+  "id": "gcloud-cli",
+  "version": "1.0.0",
+  "name": "Google Cloud CLI",
+  "description": "Installs Google Cloud CLI (gcloud) for GCP operations.",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/gcloud-cli",
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "gcloud CLI version to install"
+    },
+    "installComponents": {
+      "type": "string",
+      "default": "gcloud-crc32c,gke-gcloud-auth-plugin,skaffold",
+      "description": "Comma-separated list of additional components to install (e.g., gke-gcloud-auth-plugin,cloud-spanner-emulator)"
+    }
+  },
+  "installsAfter": []
+}

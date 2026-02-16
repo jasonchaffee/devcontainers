@@ -1,0 +1,32 @@
+{
+  "id": "spring",
+  "version": "1.0.0",
+  "name": "Spring Boot",
+  "description": "Spring Boot development tools including VS Code/IntelliJ extensions and optional Spring CLI.",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/spring",
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/java:1": {}
+  },
+  "options": {
+    "installSpringCli": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install Spring CLI for project scaffolding"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-spring-initializr",
+        "vscjava.vscode-spring-boot-dashboard"
+      ]
+    },
+    "jetbrains": {
+      "plugins": [
+        "com.intellij.spring",
+        "com.intellij.spring.boot"
+      ]
+    }
+  }
+}

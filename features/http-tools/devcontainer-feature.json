@@ -1,0 +1,17 @@
+{
+  "id": "http-tools",
+  "version": "1.0.0",
+  "name": "HTTP Tools",
+  "description": "HTTP client tools for API testing: xh (modern curl/httpie alternative)",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/http-tools",
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "options": {
+    "installXh": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install xh (modern HTTP client)"
+    }
+  }
+}

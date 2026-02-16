@@ -1,0 +1,133 @@
+{
+  "id": "java",
+  "version": "1.0.0",
+  "name": "Java",
+  "description": "Development container for Java with configurable tools and features.",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/templates/java",
+  "options": {
+
+    "_commentJava": "================= Java =================",
+    "javaVersion": {
+      "type": "string",
+      "enum": ["25", "21", "17", "11"],
+      "default": "25",
+      "description": "Java version"
+    },
+    "jdkDistro": {
+      "type": "string",
+      "enum": ["zulu", "temurin", "ms"],
+      "default": "zulu",
+      "description": "JDK distribution"
+    },
+    "installMaven": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install Apache Maven"
+    },
+    "installGradle": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install Gradle"
+    },
+    "installSpring": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install Spring Boot tools"
+    },
+    "installJmeter": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install Apache JMeter"
+    },
+
+    "_commentLanguages": "================= Languages =================",
+    "installNode": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install Node.js"
+    },
+    "installPython": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install Python"
+    },
+
+    "_commentInfrastructure": "================= Infrastructure =================",
+    "installDocker": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install Docker CLI (uses host daemon)"
+    },
+    "installKubernetes": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install kubectl and Helm"
+    },
+    "installTerraform": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install Terraform"
+    },
+    "installGcloud": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install Google Cloud CLI"
+    },
+    "installGithubCli": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install GitHub CLI"
+    },
+
+    "_commentCliTools": "================= CLI Tools =================",
+    "installModernCli": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install modern CLI tools (bat, eza, fd, ripgrep, etc.)"
+    },
+    "installShellDev": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install shell development tools (shellcheck, tldr)"
+    },
+    "installHttpTools": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install HTTP clients (xh)"
+    },
+    "installTerminalExtras": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install terminal utilities (tmux, btop, viddy)"
+    },
+
+    "_commentIde": "================= IDE =================",
+    "installJetBrains": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install JetBrains IDE dependencies"
+    },
+
+    "_commentAi": "================= AI Tools =================",
+    "installClaudeCode": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install Claude Code CLI"
+    },
+    "installClaudeCodeStatusLine": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install Claude Code status line (requires installClaudeCode)"
+    },
+    "installCodex": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install OpenAI Codex CLI"
+    },
+    "installGemini": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install Google Gemini CLI"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "shell-dev",
+  "version": "1.0.0",
+  "name": "Shell Development Tools",
+  "description": "Tools for shell script development: shellcheck (linter), tldr (simplified man pages)",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/shell-dev",
+  "options": {
+    "installShellcheck": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install shellcheck (shell script linter)"
+    },
+    "installTldr": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install tldr (simplified man pages)"
+    }
+  }
+}

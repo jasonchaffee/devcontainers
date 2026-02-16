@@ -1,2 +1,139 @@
-# devcontainers
-Development Containers 
+# Development Containers
+
+A collection of development container images, features, and templates following the [Dev Container specification](https://containers.dev/).
+
+## Structure
+
+```
+├── images/           # Base Docker images
+│   └── base/         # Minimal Ubuntu base with common utilities
+├── features/         # Dev container features (reusable tool installers)
+│   ├── antidote/     # Zsh plugin manager
+│   ├── claude-code/  # Claude Code CLI
+│   ├── codex/        # OpenAI Codex CLI
+│   ├── gemini-cli/   # Google Gemini CLI
+│   ├── gcloud-cli/   # Google Cloud CLI
+│   ├── modern-cli/   # Modern Unix tools (bat, eza, fd, ripgrep, etc.)
+│   ├── shell-dev/    # Shell development tools (shellcheck, tldr)
+│   ├── http-tools/   # HTTP clients (xh)
+│   ├── terminal-extras/  # Terminal utilities (tmux, btop, viddy)
+│   ├── jetbrains/    # JetBrains IDE support
+│   └── test/         # Feature tests
+└── templates/        # Dev container templates
+    └── java/         # Java template
+```
+
+## Quick Start
+
+### Build Base Image
+
+```bash
+cd images/base
+./build.sh
+```
+
+### Test with Dev Container CLI
+
+```bash
+cd images/base
+./build.sh test
+```
+
+### Use a Template
+
+Copy a template to your project:
+
+```bash
+cp -r templates/java your-project/.devcontainer
+```
+
+Then open in VS Code/Cursor and use "Reopen in Container".
+
+## Features
+
+Each feature in `features/` can be used independently in any devcontainer.json:
+
+```jsonc
+{
+  "features": {
+    "ghcr.io/<org>/devcontainer-features/modern-cli:1": {},
+    "ghcr.io/<org>/devcontainer-features/claude-code:1": {
+      "installStatusLine": true
+    }
+  }
+}
+```
+
+### Available Features
+
+| Feature | Description |
+|---------|-------------|
+| `spring` | Spring Boot tools (VS Code/IntelliJ extensions, optional Spring CLI) |
+| `antidote` | Fast Zsh plugin manager |
+| `claude-code` | Claude Code CLI with optional status line |
+| `codex` | OpenAI Codex CLI |
+| `gemini-cli` | Google Gemini CLI |
+| `gcloud-cli` | Google Cloud CLI with components |
+| `modern-cli` | bat, eza, fd, ripgrep, zoxide, delta, fzf, yq |
+| `shell-dev` | shellcheck, tldr |
+| `http-tools` | xh (modern curl/httpie) |
+| `terminal-extras` | tmux, btop, viddy, ttyd |
+| `jetbrains` | JetBrains IDE dependencies |
+| `devcontainer-cli` | Dev Container CLI and feature development tools |
+| `jmeter` | Apache JMeter for load testing and performance measurement |
+
+## Templates
+
+Templates provide complete devcontainer configurations for specific use cases.
+
+### java
+
+Full-featured Java development environment with:
+- Java 21 (Temurin)
+- Maven/Gradle support
+- Modern CLI tools
+- AI coding assistants (Claude, Copilot, Gemini)
+- Cloud tooling (gcloud, kubectl, terraform)
+- VS Code extensions for Java development
+
+## Development
+
+### Creating a New Feature
+
+1. Create `features/<name>/devcontainer-feature.json`:
+```json
+{
+  "id": "my-feature",
+  "version": "1.0.0",
+  "name": "My Feature",
+  "description": "Description of what it installs",
+  "options": {}
+}
+```
+
+2. Create `features/<name>/install.sh`:
+```bash
+#!/bin/bash
+set -e
+echo "Installing my feature..."
+# Installation logic here
+```
+
+3. Create `features/test/<name>/test.sh`:
+```bash
+#!/bin/bash
+set -e
+echo "Testing my feature..."
+# Verification logic here
+```
+
+### Creating a New Template
+
+1. Create `templates/<name>/devcontainer-template.json` with metadata
+2. Create `templates/<name>/devcontainer.json` with the template configuration
+
+## References
+
+- [Dev Container Specification](https://containers.dev/)
+- [Dev Container Features](https://containers.dev/implementors/features/)
+- [Dev Container Templates](https://containers.dev/implementors/templates/)
