@@ -60,7 +60,11 @@ if [ -d "${ANTIDOTE_DIR}" ]; then
     echo "Antidote already installed at ${ANTIDOTE_DIR}"
 else
     echo "Installing Antidote to ${ANTIDOTE_DIR}..."
-    git clone --depth=1 https://github.com/mattmc3/antidote.git "${ANTIDOTE_DIR}"
+    # Try normal clone first, fall back to SSL-disabled if corporate proxy interferes
+    if ! git clone --depth=1 https://github.com/mattmc3/antidote.git "${ANTIDOTE_DIR}" 2>/dev/null; then
+        echo "SSL clone failed, retrying with SSL verification disabled (corporate proxy detected)..."
+        GIT_SSL_NO_VERIFY=true git clone --depth=1 https://github.com/mattmc3/antidote.git "${ANTIDOTE_DIR}"
+    fi
 fi
 
 # Create cache directory for plugins
