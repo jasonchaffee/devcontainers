@@ -6,8 +6,7 @@ See [README.md](README.md) for structure, commands, and available features/templ
 
 ## Repository Layout
 
-- `images/` - Base Docker images with build scripts
-- `features/` - Dev container features (each has `devcontainer-feature.json` + `install.sh`)
+- `features/src/` - Dev container features (each has `devcontainer-feature.json` + `install.sh`)
 - `features/test/` - Test scripts for features
 - `templates/` - Complete devcontainer configurations (each has `devcontainer-template.json` + `devcontainer.json`)
 

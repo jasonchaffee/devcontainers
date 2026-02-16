@@ -5,20 +5,21 @@ A collection of development container features and templates following the [Dev 
 ## Structure
 
 ```
-├── features/         # Dev container features (reusable tool installers)
-│   ├── antidote/     # Zsh plugin manager
-│   ├── claude-code/  # Claude Code CLI
-│   ├── codex/        # OpenAI Codex CLI
-│   ├── gemini-cli/   # Google Gemini CLI
-│   ├── gcloud-cli/   # Google Cloud CLI
-│   ├── modern-cli/   # Modern Unix tools (bat, eza, fd, ripgrep, etc.)
-│   ├── shell-dev/    # Shell development tools (shellcheck, tldr)
-│   ├── http-tools/   # HTTP clients (xh)
-│   ├── terminal-extras/  # Terminal utilities (tmux, btop, viddy)
-│   ├── jetbrains/    # JetBrains IDE support
-│   └── test/         # Feature tests
-└── templates/        # Dev container templates
-    └── java/         # Java template
+├── features/              # Dev container features
+│   ├── src/               # Feature source code
+│   │   ├── antidote/      # Zsh plugin manager
+│   │   ├── claude-code/   # Claude Code CLI
+│   │   ├── codex/         # OpenAI Codex CLI
+│   │   ├── gemini-cli/    # Google Gemini CLI
+│   │   ├── gcloud-cli/    # Google Cloud CLI
+│   │   ├── modern-cli/    # Modern Unix tools (bat, eza, fd, ripgrep, etc.)
+│   │   ├── shell-dev/     # Shell development tools (shellcheck, tldr)
+│   │   ├── http-tools/    # HTTP clients (xh)
+│   │   ├── terminal-extras/  # Terminal utilities (tmux, btop, viddy)
+│   │   └── jetbrains/     # JetBrains IDE support
+│   └── test/              # Feature tests
+└── templates/             # Dev container templates
+    └── java/              # Java template
 ```
 
 ## Quick Start
@@ -83,7 +84,7 @@ Full-featured Java development environment with:
 
 ### Creating a New Feature
 
-1. Create `features/<name>/devcontainer-feature.json`:
+1. Create `features/src/<name>/devcontainer-feature.json`:
 ```json
 {
   "id": "my-feature",
@@ -94,7 +95,7 @@ Full-featured Java development environment with:
 }
 ```
 
-2. Create `features/<name>/install.sh`:
+2. Create `features/src/<name>/install.sh`:
 ```bash
 #!/bin/bash
 set -e
