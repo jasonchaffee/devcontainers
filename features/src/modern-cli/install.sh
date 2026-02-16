@@ -20,6 +20,10 @@ if command -v apt-get &> /dev/null; then
     if [ "${INSTALLBAT}" = "true" ]; then
         echo "Installing bat..."
         apt-get install -y --no-install-recommends bat
+        # On Debian/Ubuntu, bat is installed as batcat - create symlink
+        if command -v batcat &> /dev/null && ! command -v bat &> /dev/null; then
+            ln -sf $(which batcat) /usr/local/bin/bat
+        fi
     fi
 
     if [ "${INSTALLFD}" = "true" ]; then
