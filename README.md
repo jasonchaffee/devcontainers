@@ -147,6 +147,12 @@ devcontainer features test -p features/ -i mcr.microsoft.com/devcontainers/base:
 devcontainer features test -p features/ -i fedora:latest
 ```
 
+Skip scenario tests (use only the base image you specify):
+
+```bash
+devcontainer features test -p features/ -i pp-devcontainer:latest --skip-scenarios
+```
+
 Test scenario variations (defined in `features/test/<name>/scenarios.json`):
 
 ```bash
