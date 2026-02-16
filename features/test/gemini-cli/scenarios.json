@@ -1,9 +1,9 @@
 {
-  "skip_install": {
+  "specific_version": {
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
       "gemini-cli": {
-        "install": false
+        "version": "0.1.0"
       }
     }
   },

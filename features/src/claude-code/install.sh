@@ -1,16 +1,10 @@
 #!/bin/bash
 set -e
 
-INSTALL="${INSTALL:-true}"
+VERSION="${VERSION:-latest}"
 INSTALLSTATUSLINE="${INSTALLSTATUSLINE:-true}"
 
-# Skip installation if install=false
-if [ "${INSTALL}" = "false" ]; then
-    echo "Skipping Claude Code CLI installation (install=false)"
-    exit 0
-fi
-
-echo "Installing Claude Code CLI..."
+echo "Installing Claude Code CLI (version: ${VERSION})..."
 
 # Dependencies (curl, ca-certificates) provided by common-utils via dependsOn
 
@@ -26,22 +20,14 @@ fi
 echo "Installing for user: ${TARGET_USER} (home: ${TARGET_HOME})"
 
 # Install Claude Code using native installer
-# The installer puts claude in ~/.claude/bin/claude
-# We need to run as the target user so it installs to their home
+# Usage: bash [stable|latest|VERSION]
+INSTALL_CMD="curl -fsSL https://claude.ai/install.sh | bash -s -- ${VERSION}"
+
+echo "Running: ${INSTALL_CMD}"
 if [ "${TARGET_USER}" != "root" ] && [ "$(id -u)" = "0" ]; then
-    # Running as root but target is non-root user - use su
-    su - "${TARGET_USER}" -c 'curl -fsSL https://claude.ai/install.sh | bash' || {
-        echo "Warning: Native installer failed, trying alternative install..."
-        # Fallback: install globally via npm if available
-        if command -v npm &> /dev/null; then
-            npm install -g @anthropic-ai/claude-code || true
-        fi
-    }
+    su - "${TARGET_USER}" -c "${INSTALL_CMD}"
 else
-    # Running as target user or root is target
-    curl -fsSL https://claude.ai/install.sh | bash || {
-        echo "Warning: Native installer failed"
-    }
+    eval "${INSTALL_CMD}"
 fi
 
 # Verify installation and ensure PATH is set

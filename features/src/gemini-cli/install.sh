@@ -1,16 +1,9 @@
 #!/bin/bash
 set -e
 
-INSTALL="${INSTALL:-true}"
 VERSION="${VERSION:-latest}"
 
-# Skip installation if install=false
-if [ "${INSTALL}" = "false" ]; then
-    echo "Skipping Google Gemini CLI installation (install=false)"
-    exit 0
-fi
-
-echo "Installing Google Gemini CLI..."
+echo "Installing Google Gemini CLI (version: ${VERSION})..."
 
 # npm is provided by the node feature via dependsOn
 # Use --prefer-offline to speed up installation when packages are cached

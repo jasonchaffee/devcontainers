@@ -11,10 +11,10 @@
     }
   },
   "options": {
-    "install": {
-      "type": "boolean",
-      "default": true,
-      "description": "Set to false to skip installation"
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Claude Code version to install (e.g., '2.1.20' or 'latest')"
     },
     "installStatusLine": {
       "type": "boolean",

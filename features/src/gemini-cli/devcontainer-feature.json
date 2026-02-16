@@ -5,15 +5,10 @@
   "description": "Installs Google Gemini CLI for AI-powered coding assistance.",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/gemini-cli",
   "options": {
-    "install": {
-      "type": "boolean",
-      "default": true,
-      "description": "Set to false to skip installation"
-    },
     "version": {
       "type": "string",
       "default": "latest",
-      "description": "Gemini CLI version to install"
+      "description": "Gemini CLI version to install (e.g., '0.1.0' or 'latest')"
     }
   },
   "dependsOn": {

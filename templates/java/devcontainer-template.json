@@ -116,25 +116,37 @@
     },
 
     "_commentAi": "================= AI Tools =================",
-    "installClaudeCode": {
-      "type": "boolean",
-      "default": false,
-      "description": "Install Claude Code CLI"
+    "claudeCodeVersion": {
+      "type": "string",
+      "default": "latest",
+      "description": "Claude Code CLI version (e.g., '2.1.20' or 'latest')"
     },
-    "installClaudeCodeStatusLine": {
+    "claudeCodeStatusLine": {
       "type": "boolean",
       "default": true,
-      "description": "Install Claude Code status line (requires installClaudeCode)"
+      "description": "Install Claude Code status line"
     },
-    "installCodex": {
-      "type": "boolean",
-      "default": false,
-      "description": "Install OpenAI Codex CLI"
+    "codexVersion": {
+      "type": "string",
+      "default": "latest",
+      "description": "OpenAI Codex CLI version (e.g., '0.1.0' or 'latest')"
     },
-    "installGemini": {
-      "type": "boolean",
-      "default": false,
-      "description": "Install Google Gemini CLI"
+    "geminiVersion": {
+      "type": "string",
+      "default": "latest",
+      "description": "Google Gemini CLI version (e.g., '0.1.0' or 'latest')"
+    },
+
+    "_commentCloud": "================= Cloud =================",
+    "gcloudVersion": {
+      "type": "string",
+      "default": "latest",
+      "description": "Google Cloud CLI version (e.g., '450.0.0' or 'latest')"
+    },
+    "gcloudComponents": {
+      "type": "string",
+      "default": "gcloud-crc32c,gke-gcloud-auth-plugin,skaffold",
+      "description": "Comma-separated gcloud components to install"
     }
   }
 }

@@ -95,9 +95,12 @@
     // "ghcr.io/devcontainers/features/terraform:1": {}
 
     // =========================================================================
-    // Optional: Google Cloud (installGcloud: false)
+    // Optional: Google Cloud (uncomment to enable)
     // =========================================================================
-    // "ghcr.io/jasonchaffee/devcontainers/gcloud-cli:1": {}
+    // "ghcr.io/jasonchaffee/devcontainers/gcloud-cli:1": {
+    //   "version": "${templateOption:gcloudVersion}",
+    //   "installComponents": "${templateOption:gcloudComponents}"
+    // }
 
     // =========================================================================
     // Optional: Spring Boot (installSpring: false)
@@ -120,17 +123,17 @@
     "ghcr.io/jasonchaffee/devcontainers/jetbrains:1": {},
 
     // =========================================================================
-    // AI Tools (install controlled by template options)
+    // AI Tools (version controlled by template options)
     // =========================================================================
     "ghcr.io/jasonchaffee/devcontainers/claude-code:1": {
-      "install": "${templateOption:installClaudeCode}",
-      "installStatusLine": true
+      "version": "${templateOption:claudeCodeVersion}",
+      "installStatusLine": "${templateOption:claudeCodeStatusLine}"
     },
     "ghcr.io/jasonchaffee/devcontainers/codex:1": {
-      "install": "${templateOption:installCodex}"
+      "version": "${templateOption:codexVersion}"
     },
     "ghcr.io/jasonchaffee/devcontainers/gemini-cli:1": {
-      "install": "${templateOption:installGemini}"
+      "version": "${templateOption:geminiVersion}"
     }
 
     // =========================================================================

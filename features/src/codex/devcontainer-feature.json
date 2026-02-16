@@ -5,15 +5,10 @@
   "description": "Installs OpenAI Codex CLI for AI-powered coding assistance.",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/codex",
   "options": {
-    "install": {
-      "type": "boolean",
-      "default": true,
-      "description": "Set to false to skip installation"
-    },
     "version": {
       "type": "string",
       "default": "latest",
-      "description": "Codex CLI version to install"
+      "description": "Codex CLI version to install (e.g., '0.1.0' or 'latest')"
     }
   },
   "dependsOn": {

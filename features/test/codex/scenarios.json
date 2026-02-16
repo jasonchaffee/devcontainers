@@ -1,9 +1,9 @@
 {
-  "skip_install": {
+  "specific_version": {
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
       "codex": {
-        "install": false
+        "version": "0.1.2505090827"
       }
     }
   },
