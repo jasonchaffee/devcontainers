@@ -59,72 +59,7 @@ fi
 
 # Install status line feature (optional)
 if [ "${INSTALLSTATUSLINE}" = "true" ]; then
-    echo "Installing status line feature..."
-
-    # Create scripts directory
-    SCRIPTS_DIR="${TARGET_HOME}/.claude/scripts"
-    mkdir -p "${SCRIPTS_DIR}"
-
-    # Deploy status line Python script (jasonchaffee-statusline)
-    # Get the directory where this install script is located
-    FEATURE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-    # Copy the Python script from the feature directory
-    if [ -f "${FEATURE_DIR}/jasonchaffee-statusline.py" ]; then
-        cp "${FEATURE_DIR}/jasonchaffee-statusline.py" "${SCRIPTS_DIR}/jasonchaffee-statusline.py"
-    else
-        echo "Warning: jasonchaffee-statusline.py not found in feature directory"
-    fi
-
-    chmod +x "${SCRIPTS_DIR}/jasonchaffee-statusline.py"
-
-    # Update settings.json
-    SETTINGS_FILE="${TARGET_HOME}/.claude/settings.json"
-
-    if [ ! -f "${SETTINGS_FILE}" ]; then
-        echo '{
-  "$schema": "https://json.schemastore.org/claude-code-settings.json"
-}' > "${SETTINGS_FILE}"
-    fi
-
-    # Merge statusLine configuration into settings.json
-    # Try jq first, then python3, then fall back to simple replacement
-    if command -v jq &> /dev/null; then
-        jq '.statusLine = {"type": "command", "command": "python3 ~/.claude/scripts/jasonchaffee-statusline.py", "padding": 0}' \
-            "${SETTINGS_FILE}" > "${SETTINGS_FILE}.tmp" && mv "${SETTINGS_FILE}.tmp" "${SETTINGS_FILE}"
-    elif command -v python3 &> /dev/null; then
-        python3 << PYTHON_SCRIPT
-import json
-
-settings_file = "${SETTINGS_FILE}"
-
-with open(settings_file, 'r') as f:
-    settings = json.load(f)
-
-settings['statusLine'] = {
-    "type": "command",
-    "command": "python3 ~/.claude/scripts/jasonchaffee-statusline.py",
-    "padding": 0
-}
-
-with open(settings_file, 'w') as f:
-    json.dump(settings, f, indent=2)
-    f.write('\n')
-PYTHON_SCRIPT
-    else
-        # Fallback: create new settings file with statusLine
-        echo '{
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "statusLine": {
-    "type": "command",
-    "command": "python3 ~/.claude/scripts/jasonchaffee-statusline.py",
-    "padding": 0
-  }
-}' > "${SETTINGS_FILE}"
-    fi
-
-    # Fix ownership
+    echo "Installing status line feature from GitHub..."
+    curl -fsSL https://raw.githubusercontent.com/jasonchaffee/ai/main/claude/settings/statuslines/jasonchaffee/install.sh | bash
     chown -R "${TARGET_USER}:${TARGET_USER}" "${TARGET_HOME}/.claude" 2>/dev/null || true
-
-    echo "Status line feature installed successfully"
 fi
