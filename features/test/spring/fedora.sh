@@ -6,9 +6,9 @@ echo "Testing Spring on Fedora..."
 # Check if Java is available
 echo "Checking Java dependency..."
 if command -v java &> /dev/null; then
-    echo "✓ Java is available: $(java --version 2>&1 | head -1)"
+    echo "[OK] Java is available: $(java --version 2>&1 | head -1)"
 else
-    echo "✗ Java not found"
+    echo "[FAIL] Java not found"
     exit 1
 fi
 
@@ -16,9 +16,9 @@ fi
 echo ""
 echo "Checking Spring CLI (optional)..."
 if command -v spring &> /dev/null; then
-    echo "✓ Spring CLI installed"
+    echo "[OK] Spring CLI installed"
 else
-    echo "○ Spring CLI not installed (optional - set installSpringCli: true to enable)"
+    echo "[SKIP] Spring CLI not installed (optional - set installSpringCli: true to enable)"
 fi
 
 echo ""

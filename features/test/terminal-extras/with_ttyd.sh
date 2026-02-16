@@ -6,9 +6,9 @@ echo "Testing Terminal Extras with installTtyd=true..."
 # Check tmux
 echo "Checking tmux..."
 if command -v tmux &> /dev/null; then
-    echo "✓ tmux installed"
+    echo "[OK] tmux installed"
 else
-    echo "✗ tmux not found"
+    echo "[FAIL] tmux not found"
     exit 1
 fi
 
@@ -16,9 +16,9 @@ fi
 echo ""
 echo "Checking btop..."
 if command -v btop &> /dev/null; then
-    echo "✓ btop installed"
+    echo "[OK] btop installed"
 else
-    echo "✗ btop not found"
+    echo "[FAIL] btop not found"
     exit 1
 fi
 
@@ -26,9 +26,9 @@ fi
 echo ""
 echo "Checking viddy..."
 if command -v viddy &> /dev/null; then
-    echo "✓ viddy installed"
+    echo "[OK] viddy installed"
 else
-    echo "✗ viddy not found"
+    echo "[FAIL] viddy not found"
     exit 1
 fi
 
@@ -36,9 +36,9 @@ fi
 echo ""
 echo "Checking ttyd..."
 if command -v ttyd &> /dev/null; then
-    echo "✓ ttyd installed"
+    echo "[OK] ttyd installed"
 else
-    echo "✗ ttyd not found (should be installed with installTtyd=true)"
+    echo "[FAIL] ttyd not found (should be installed with installTtyd=true)"
     exit 1
 fi
 

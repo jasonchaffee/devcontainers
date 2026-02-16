@@ -6,9 +6,9 @@ echo "Testing JMeter on Alpine..."
 # Check if Java is available
 echo "Checking Java dependency..."
 if command -v java &> /dev/null; then
-    echo "✓ Java is available: $(java --version 2>&1 | head -1)"
+    echo "[OK] Java is available: $(java --version 2>&1 | head -1)"
 else
-    echo "✗ Java not found (JMeter requires Java)"
+    echo "[FAIL] Java not found (JMeter requires Java)"
     exit 1
 fi
 
@@ -16,9 +16,9 @@ fi
 echo ""
 echo "Checking JMeter installation..."
 if command -v jmeter &> /dev/null; then
-    echo "✓ JMeter is available"
+    echo "[OK] JMeter is available"
 else
-    echo "✗ JMeter not found in PATH"
+    echo "[FAIL] JMeter not found in PATH"
     exit 1
 fi
 
@@ -26,9 +26,9 @@ fi
 echo ""
 echo "Checking JMETER_HOME..."
 if [ -d "/opt/jmeter" ]; then
-    echo "✓ JMETER_HOME exists at /opt/jmeter"
+    echo "[OK] JMETER_HOME exists at /opt/jmeter"
 else
-    echo "✗ JMETER_HOME not found"
+    echo "[FAIL] JMETER_HOME not found"
     exit 1
 fi
 

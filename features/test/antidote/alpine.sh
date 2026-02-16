@@ -6,9 +6,9 @@ echo "Testing Antidote on Alpine..."
 # Check if zsh is installed
 echo "Checking Zsh..."
 if command -v zsh &> /dev/null; then
-    echo "✓ Zsh installed: $(zsh --version)"
+    echo "[OK] Zsh installed: $(zsh --version)"
 else
-    echo "✗ Zsh not found"
+    echo "[FAIL] Zsh not found"
     exit 1
 fi
 
@@ -17,9 +17,9 @@ echo ""
 echo "Checking Antidote..."
 ANTIDOTE_DIR="${HOME}/.antidote"
 if [ -d "$ANTIDOTE_DIR" ]; then
-    echo "✓ Antidote installed at $ANTIDOTE_DIR"
+    echo "[OK] Antidote installed at $ANTIDOTE_DIR"
 else
-    echo "✗ Antidote not found at $ANTIDOTE_DIR"
+    echo "[FAIL] Antidote not found at $ANTIDOTE_DIR"
     exit 1
 fi
 

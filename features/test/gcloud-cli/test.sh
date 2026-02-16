@@ -6,9 +6,9 @@ echo "Testing Google Cloud CLI..."
 # Check gcloud installation
 echo "Checking gcloud..."
 if command -v gcloud &> /dev/null; then
-    echo "✓ gcloud installed: $(gcloud --version 2>/dev/null | head -1)"
+    echo "[OK] gcloud installed: $(gcloud --version 2>/dev/null | head -1)"
 else
-    echo "✗ gcloud not found"
+    echo "[FAIL] gcloud not found"
     exit 1
 fi
 
@@ -16,9 +16,9 @@ fi
 echo ""
 echo "Checking gsutil..."
 if command -v gsutil &> /dev/null; then
-    echo "✓ gsutil installed"
+    echo "[OK] gsutil installed"
 else
-    echo "✗ gsutil not found"
+    echo "[FAIL] gsutil not found"
     exit 1
 fi
 
@@ -26,9 +26,9 @@ fi
 echo ""
 echo "Checking bq..."
 if command -v bq &> /dev/null; then
-    echo "✓ bq installed"
+    echo "[OK] bq installed"
 else
-    echo "✗ bq not found"
+    echo "[FAIL] bq not found"
     exit 1
 fi
 

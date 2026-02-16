@@ -5,18 +5,18 @@ echo "Testing Shell Development Tools on Debian..."
 
 echo "Checking shellcheck..."
 if command -v shellcheck &> /dev/null; then
-    echo "✓ shellcheck installed"
+    echo "[OK] shellcheck installed"
 else
-    echo "✗ shellcheck not found"
+    echo "[FAIL] shellcheck not found"
     exit 1
 fi
 
 echo ""
 echo "Checking tldr..."
 if command -v tldr &> /dev/null; then
-    echo "✓ tldr installed"
+    echo "[OK] tldr installed"
 else
-    echo "✗ tldr not found"
+    echo "[FAIL] tldr not found"
     exit 1
 fi
 

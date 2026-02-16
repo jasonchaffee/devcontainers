@@ -6,9 +6,9 @@ echo "Testing Shell Development Tools..."
 # Check shellcheck
 echo "Checking shellcheck..."
 if command -v shellcheck &> /dev/null; then
-    echo "✓ shellcheck installed: $(shellcheck --version 2>&1 | head -2 | tail -1)"
+    echo "[OK] shellcheck installed: $(shellcheck --version 2>&1 | head -2 | tail -1)"
 else
-    echo "✗ shellcheck not found"
+    echo "[FAIL] shellcheck not found"
     exit 1
 fi
 
@@ -16,9 +16,9 @@ fi
 echo ""
 echo "Checking tldr..."
 if command -v tldr &> /dev/null; then
-    echo "✓ tldr installed"
+    echo "[OK] tldr installed"
 else
-    echo "✗ tldr not found"
+    echo "[FAIL] tldr not found"
     exit 1
 fi
 

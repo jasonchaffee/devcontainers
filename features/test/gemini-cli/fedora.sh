@@ -6,9 +6,9 @@ echo "Testing Gemini CLI on Fedora..."
 # Check if npm is available
 echo "Checking npm..."
 if command -v npm &> /dev/null; then
-    echo "✓ npm installed: $(npm --version)"
+    echo "[OK] npm installed: $(npm --version)"
 else
-    echo "✗ npm not found"
+    echo "[FAIL] npm not found"
     exit 1
 fi
 
@@ -16,10 +16,10 @@ fi
 echo ""
 echo "Checking Gemini CLI..."
 if command -v gemini &> /dev/null; then
-    echo "✓ Gemini CLI installed"
+    echo "[OK] Gemini CLI installed"
     gemini --version 2>&1 | head -1 || true
 else
-    echo "✗ Gemini CLI not found"
+    echo "[FAIL] Gemini CLI not found"
     exit 1
 fi
 

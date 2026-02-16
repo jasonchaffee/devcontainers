@@ -8,9 +8,9 @@ FAILED=0
 # Check bat
 echo "Checking bat..."
 if command -v bat &> /dev/null; then
-    echo "✓ bat installed: $(bat --version 2>&1 | head -1)"
+    echo "[OK] bat installed: $(bat --version 2>&1 | head -1)"
 else
-    echo "✗ bat not found"
+    echo "[FAIL] bat not found"
     FAILED=1
 fi
 
@@ -18,9 +18,9 @@ fi
 echo ""
 echo "Checking eza..."
 if command -v eza &> /dev/null; then
-    echo "✓ eza installed: $(eza --version 2>&1 | head -1)"
+    echo "[OK] eza installed: $(eza --version 2>&1 | head -1)"
 else
-    echo "✗ eza not found"
+    echo "[FAIL] eza not found"
     FAILED=1
 fi
 
@@ -28,11 +28,11 @@ fi
 echo ""
 echo "Checking fd..."
 if command -v fd &> /dev/null; then
-    echo "✓ fd installed: $(fd --version 2>&1 | head -1)"
+    echo "[OK] fd installed: $(fd --version 2>&1 | head -1)"
 elif command -v fdfind &> /dev/null; then
-    echo "✓ fd installed as fdfind: $(fdfind --version 2>&1 | head -1)"
+    echo "[OK] fd installed as fdfind: $(fdfind --version 2>&1 | head -1)"
 else
-    echo "✗ fd not found"
+    echo "[FAIL] fd not found"
     FAILED=1
 fi
 
@@ -40,9 +40,9 @@ fi
 echo ""
 echo "Checking ripgrep..."
 if command -v rg &> /dev/null; then
-    echo "✓ ripgrep installed: $(rg --version 2>&1 | head -1)"
+    echo "[OK] ripgrep installed: $(rg --version 2>&1 | head -1)"
 else
-    echo "✗ ripgrep not found"
+    echo "[FAIL] ripgrep not found"
     FAILED=1
 fi
 
@@ -50,9 +50,9 @@ fi
 echo ""
 echo "Checking zoxide..."
 if command -v zoxide &> /dev/null; then
-    echo "✓ zoxide installed: $(zoxide --version 2>&1 | head -1)"
+    echo "[OK] zoxide installed: $(zoxide --version 2>&1 | head -1)"
 else
-    echo "✗ zoxide not found"
+    echo "[FAIL] zoxide not found"
     FAILED=1
 fi
 
@@ -60,9 +60,9 @@ fi
 echo ""
 echo "Checking delta..."
 if command -v delta &> /dev/null; then
-    echo "✓ delta installed: $(delta --version 2>&1 | head -1)"
+    echo "[OK] delta installed: $(delta --version 2>&1 | head -1)"
 else
-    echo "✗ delta not found"
+    echo "[FAIL] delta not found"
     FAILED=1
 fi
 
@@ -70,9 +70,9 @@ fi
 echo ""
 echo "Checking fzf..."
 if command -v fzf &> /dev/null; then
-    echo "✓ fzf installed: $(fzf --version 2>&1 | head -1)"
+    echo "[OK] fzf installed: $(fzf --version 2>&1 | head -1)"
 else
-    echo "✗ fzf not found"
+    echo "[FAIL] fzf not found"
     FAILED=1
 fi
 
@@ -80,9 +80,9 @@ fi
 echo ""
 echo "Checking yq..."
 if command -v yq &> /dev/null; then
-    echo "✓ yq installed: $(yq --version 2>&1 | head -1)"
+    echo "[OK] yq installed: $(yq --version 2>&1 | head -1)"
 else
-    echo "✗ yq not found"
+    echo "[FAIL] yq not found"
     FAILED=1
 fi
 

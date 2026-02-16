@@ -6,9 +6,9 @@ echo "Testing Google Gemini CLI..."
 # Check gemini installation
 echo "Checking gemini..."
 if command -v gemini &> /dev/null; then
-    echo "✓ gemini installed: $(gemini --version 2>/dev/null || echo 'version check requires auth')"
+    echo "[OK] gemini installed: $(gemini --version 2>/dev/null || echo 'version check requires auth')"
 else
-    echo "✗ gemini not found"
+    echo "[FAIL] gemini not found"
     exit 1
 fi
 

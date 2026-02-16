@@ -6,9 +6,9 @@ echo "Testing gcloud-cli with minimal components..."
 # gcloud should be installed
 echo "Checking gcloud..."
 if command -v gcloud &> /dev/null; then
-    echo "✓ gcloud installed: $(gcloud --version 2>&1 | head -1)"
+    echo "[OK] gcloud installed: $(gcloud --version 2>&1 | head -1)"
 else
-    echo "✗ gcloud not found"
+    echo "[FAIL] gcloud not found"
     exit 1
 fi
 
@@ -16,16 +16,16 @@ fi
 echo ""
 echo "Checking core tools..."
 if command -v gsutil &> /dev/null; then
-    echo "✓ gsutil installed"
+    echo "[OK] gsutil installed"
 else
-    echo "✗ gsutil not found"
+    echo "[FAIL] gsutil not found"
     exit 1
 fi
 
 if command -v bq &> /dev/null; then
-    echo "✓ bq installed"
+    echo "[OK] bq installed"
 else
-    echo "✗ bq not found"
+    echo "[FAIL] bq not found"
     exit 1
 fi
 
@@ -34,9 +34,9 @@ echo ""
 echo "Checking optional components are not installed..."
 COMPONENTS=$(gcloud components list --format="value(id)" 2>/dev/null | tr '\n' ' ')
 if echo "$COMPONENTS" | grep -q "skaffold"; then
-    echo "○ Skaffold installed (may be from base image)"
+    echo "[SKIP] Skaffold installed (may be from base image)"
 else
-    echo "✓ Skaffold not installed (as expected with empty installComponents)"
+    echo "[OK] Skaffold not installed (as expected with empty installComponents)"
 fi
 
 echo ""

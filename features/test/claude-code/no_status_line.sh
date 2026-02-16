@@ -6,9 +6,9 @@ echo "Testing Claude Code with installStatusLine=false..."
 # Claude should be installed
 echo "Checking Claude Code CLI..."
 if command -v claude &> /dev/null; then
-    echo "✓ Claude Code CLI installed"
+    echo "[OK] Claude Code CLI installed"
 else
-    echo "✗ Claude Code CLI not found"
+    echo "[FAIL] Claude Code CLI not found"
     exit 1
 fi
 
@@ -17,10 +17,10 @@ echo ""
 echo "Verifying status line is NOT installed..."
 SCRIPTS_DIR="${HOME}/.claude/scripts"
 if [ -f "$SCRIPTS_DIR/jasonchaffee-statusline.py" ]; then
-    echo "✗ Status line should not be installed when installStatusLine=false"
+    echo "[FAIL] Status line should not be installed when installStatusLine=false"
     exit 1
 else
-    echo "✓ Status line correctly not installed"
+    echo "[OK] Status line correctly not installed"
 fi
 
 echo ""

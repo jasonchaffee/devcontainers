@@ -6,9 +6,9 @@ echo "Testing Codex CLI on Fedora..."
 # Check if npm is available
 echo "Checking npm..."
 if command -v npm &> /dev/null; then
-    echo "✓ npm installed: $(npm --version)"
+    echo "[OK] npm installed: $(npm --version)"
 else
-    echo "✗ npm not found"
+    echo "[FAIL] npm not found"
     exit 1
 fi
 
@@ -16,10 +16,10 @@ fi
 echo ""
 echo "Checking Codex CLI..."
 if command -v codex &> /dev/null; then
-    echo "✓ Codex CLI installed"
+    echo "[OK] Codex CLI installed"
     codex --version 2>&1 | head -1 || true
 else
-    echo "✗ Codex CLI not found"
+    echo "[FAIL] Codex CLI not found"
     exit 1
 fi
 
