@@ -5,7 +5,10 @@
   "description": "Tools for shell script development: shellcheck (linter), tldr (simplified man pages)",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/shell-dev",
   "dependsOn": {
-    "ghcr.io/devcontainers/features/common-utils:2": {}
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installOhMyZsh": false,
+      "installOhMyZshConfig": false
+    }
   },
   "options": {
     "installShellcheck": {

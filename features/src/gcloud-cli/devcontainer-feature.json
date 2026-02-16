@@ -5,7 +5,10 @@
   "description": "Installs Google Cloud CLI (gcloud) for GCP operations.",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/gcloud-cli",
   "dependsOn": {
-    "ghcr.io/devcontainers/features/common-utils:2": {}
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installOhMyZsh": false,
+      "installOhMyZshConfig": false
+    }
   },
   "options": {
     "version": {

@@ -5,7 +5,10 @@
   "description": "Terminal utilities: tmux (multiplexer), btop (system monitor), viddy (modern watch), ttyd (terminal over web)",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/terminal-extras",
   "dependsOn": {
-    "ghcr.io/devcontainers/features/common-utils:2": {}
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installOhMyZsh": false,
+      "installOhMyZshConfig": false
+    }
   },
   "options": {
     "installTmux": {

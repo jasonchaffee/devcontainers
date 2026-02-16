@@ -5,7 +5,10 @@
   "description": "Modern replacements for standard Unix tools: bat (cat), eza (ls), fd (find), ripgrep (grep), zoxide (cd), delta (diff), fzf (fuzzy finder), yq (YAML processor)",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/modern-cli",
   "dependsOn": {
-    "ghcr.io/devcontainers/features/common-utils:2": {}
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installOhMyZsh": false,
+      "installOhMyZshConfig": false
+    }
   },
   "options": {
     "installBat": {

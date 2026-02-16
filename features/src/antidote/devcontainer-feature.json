@@ -5,7 +5,10 @@
   "description": "Installs Antidote, a fast Zsh plugin manager. Lighter and faster than Oh My Zsh.",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/antidote",
   "dependsOn": {
-    "ghcr.io/devcontainers/features/common-utils:2": {}
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installOhMyZsh": false,
+      "installOhMyZshConfig": false
+    }
   },
   "options": {
     "installZsh": {
