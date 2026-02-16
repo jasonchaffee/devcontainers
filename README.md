@@ -125,6 +125,38 @@ Test a specific feature:
 devcontainer features test -f claude-code -p features/
 ```
 
+Test all features:
+
+```bash
+devcontainer features test -p features/
+```
+
+Test with a specific base image:
+
+```bash
+# Ubuntu (default)
+devcontainer features test -p features/ -i mcr.microsoft.com/devcontainers/base:ubuntu
+
+# Debian
+devcontainer features test -p features/ -i mcr.microsoft.com/devcontainers/base:debian
+
+# Alpine
+devcontainer features test -p features/ -i mcr.microsoft.com/devcontainers/base:alpine
+
+# Fedora
+devcontainer features test -p features/ -i fedora:latest
+```
+
+Test scenario variations (defined in `features/test/<name>/scenarios.json`):
+
+```bash
+# Run all scenarios for a feature
+devcontainer features test -f modern-cli -p features/
+
+# Scenarios test different options, base images, and configurations
+# Example scenarios: debian, alpine, fedora, skip_install, with_ttyd, etc.
+```
+
 ### Testing Templates
 
 Generate a project from the template:
