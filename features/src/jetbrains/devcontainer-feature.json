@@ -4,6 +4,8 @@
   "name": "JetBrains IDE Support",
   "description": "Installs dependencies required for JetBrains IDEs (IntelliJ IDEA, PyCharm, WebStorm, GoLand, etc.) to work with devcontainers.",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/jetbrains",
-  "options": {},
-  "installsAfter": []
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "options": {}
 }

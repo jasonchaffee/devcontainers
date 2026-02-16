@@ -4,6 +4,9 @@
   "name": "Google Cloud CLI",
   "description": "Installs Google Cloud CLI (gcloud) for GCP operations.",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/gcloud-cli",
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
   "options": {
     "version": {
       "type": "string",
@@ -16,5 +19,4 @@
       "description": "Comma-separated list of additional components to install (e.g., gke-gcloud-auth-plugin,cloud-spanner-emulator)"
     }
   },
-  "installsAfter": []
 }
