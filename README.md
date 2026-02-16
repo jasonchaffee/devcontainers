@@ -1,12 +1,10 @@
 # Development Containers
 
-A collection of development container images, features, and templates following the [Dev Container specification](https://containers.dev/).
+A collection of development container features and templates following the [Dev Container specification](https://containers.dev/).
 
 ## Structure
 
 ```
-├── images/           # Base Docker images
-│   └── base/         # Minimal Ubuntu base with common utilities
 ├── features/         # Dev container features (reusable tool installers)
 │   ├── antidote/     # Zsh plugin manager
 │   ├── claude-code/  # Claude Code CLI
@@ -24,20 +22,6 @@ A collection of development container images, features, and templates following 
 ```
 
 ## Quick Start
-
-### Build Base Image
-
-```bash
-cd images/base
-./build.sh
-```
-
-### Test with Dev Container CLI
-
-```bash
-cd images/base
-./build.sh test
-```
 
 ### Use a Template
 
@@ -79,7 +63,6 @@ Each feature in `features/` can be used independently in any devcontainer.json:
 | `http-tools` | xh (modern curl/httpie) |
 | `terminal-extras` | tmux, btop, viddy, ttyd |
 | `jetbrains` | JetBrains IDE dependencies |
-| `devcontainer-cli` | Dev Container CLI and feature development tools |
 | `jmeter` | Apache JMeter for load testing and performance measurement |
 
 ## Templates
@@ -126,6 +109,50 @@ set -e
 echo "Testing my feature..."
 # Verification logic here
 ```
+
+### Testing Features
+
+Install the devcontainer CLI:
+
+```bash
+npm install -g @devcontainers/cli
+```
+
+Test a specific feature:
+
+```bash
+devcontainer features test -f claude-code -p features/
+```
+
+### Testing Templates
+
+Generate a project from the template:
+
+```bash
+devcontainer templates apply \
+  --template-id java \
+  --template-path templates/ \
+  --workspace-folder ./test-project
+```
+
+Build and run the container:
+
+```bash
+cd test-project
+devcontainer build --workspace-folder .
+devcontainer up --workspace-folder .
+```
+
+### Testing in VS Code/Cursor
+
+1. Copy `templates/java/devcontainer.json` to your project's `.devcontainer/` folder
+2. For local testing (before features are published), change feature references from `ghcr.io/jasonchaffee/devcontainers/...` to local paths:
+   ```json
+   "features": {
+     "../features/claude-code": { "install": true }
+   }
+   ```
+3. Open in VS Code/Cursor → "Reopen in Container"
 
 ### Creating a New Template
 
