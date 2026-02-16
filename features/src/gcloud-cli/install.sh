@@ -19,6 +19,12 @@ if command -v apt-get &> /dev/null; then
     apt-get update
     apt-get install -y --no-install-recommends curl python3 gnupg
     rm -rf /var/lib/apt/lists/*
+elif command -v apk &> /dev/null; then
+    apk add --no-cache curl python3 gnupg bash
+elif command -v dnf &> /dev/null; then
+    dnf install -y curl python3 gnupg
+elif command -v yum &> /dev/null; then
+    yum install -y curl python3 gnupg
 fi
 
 # Download and install gcloud

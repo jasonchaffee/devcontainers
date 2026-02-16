@@ -1,0 +1,20 @@
+{
+  "debian": {
+    "image": "mcr.microsoft.com/devcontainers/base:debian",
+    "features": {
+      "jetbrains": {}
+    }
+  },
+  "alpine": {
+    "image": "mcr.microsoft.com/devcontainers/base:alpine",
+    "features": {
+      "jetbrains": {}
+    }
+  },
+  "fedora": {
+    "image": "fedora:latest",
+    "features": {
+      "jetbrains": {}
+    }
+  }
+}

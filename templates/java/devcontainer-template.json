@@ -79,6 +79,13 @@
       "description": "Install GitHub CLI"
     },
 
+    "_commentPackageManager": "================= Package Managers =================",
+    "installHomebrew": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install Homebrew package manager"
+    },
+
     "_commentCliTools": "================= CLI Tools =================",
     "installModernCli": {
       "type": "boolean",

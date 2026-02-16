@@ -44,18 +44,30 @@ else
     }
 fi
 
-# Verify installation
-if [ -x "${TARGET_HOME}/.claude/bin/claude" ]; then
-    echo "Claude Code CLI installed successfully at ${TARGET_HOME}/.claude/bin/claude"
-    # Add to PATH via profile if not already there
-    PROFILE_FILE="${TARGET_HOME}/.profile"
-    if ! grep -q '.claude/bin' "${PROFILE_FILE}" 2>/dev/null; then
-        echo 'export PATH="$HOME/.claude/bin:$PATH"' >> "${PROFILE_FILE}"
-        chown "${TARGET_USER}:${TARGET_USER}" "${PROFILE_FILE}" 2>/dev/null || true
-    fi
+# Verify installation and ensure PATH is set
+# The installer may put claude in ~/.local/bin or ~/.claude/bin
+CLAUDE_BIN=""
+if [ -x "${TARGET_HOME}/.local/bin/claude" ]; then
+    CLAUDE_BIN="${TARGET_HOME}/.local/bin"
+    echo "Claude Code CLI installed successfully at ${CLAUDE_BIN}/claude"
+elif [ -x "${TARGET_HOME}/.claude/bin/claude" ]; then
+    CLAUDE_BIN="${TARGET_HOME}/.claude/bin"
+    echo "Claude Code CLI installed successfully at ${CLAUDE_BIN}/claude"
 elif command -v claude &> /dev/null; then
     echo "Claude Code CLI installed successfully (global install)"
-else
+fi
+
+# Add to PATH via profile if not already there
+if [ -n "${CLAUDE_BIN}" ]; then
+    PROFILE_FILE="${TARGET_HOME}/.profile"
+    BIN_PATH_PATTERN=$(basename "${CLAUDE_BIN}")
+    if ! grep -q "${BIN_PATH_PATTERN}" "${PROFILE_FILE}" 2>/dev/null; then
+        echo "export PATH=\"${CLAUDE_BIN}:\$PATH\"" >> "${PROFILE_FILE}"
+        chown "${TARGET_USER}:${TARGET_USER}" "${PROFILE_FILE}" 2>/dev/null || true
+    fi
+fi
+
+if [ -z "${CLAUDE_BIN}" ] && ! command -v claude &> /dev/null; then
     echo "Warning: Claude Code CLI installation could not be verified"
 fi
 
@@ -89,29 +101,41 @@ if [ "${INSTALLSTATUSLINE}" = "true" ]; then
 }' > "${SETTINGS_FILE}"
     fi
 
-    # Use Python to merge the statusLine configuration
-    python3 << PYTHON_SCRIPT
+    # Merge statusLine configuration into settings.json
+    # Try jq first, then python3, then fall back to simple replacement
+    if command -v jq &> /dev/null; then
+        jq '.statusLine = {"type": "command", "command": "python3 ~/.claude/scripts/jasonchaffee-statusline.py", "padding": 0}' \
+            "${SETTINGS_FILE}" > "${SETTINGS_FILE}.tmp" && mv "${SETTINGS_FILE}.tmp" "${SETTINGS_FILE}"
+    elif command -v python3 &> /dev/null; then
+        python3 << PYTHON_SCRIPT
 import json
-import os
 
 settings_file = "${SETTINGS_FILE}"
 
-# Read existing settings
 with open(settings_file, 'r') as f:
     settings = json.load(f)
 
-# Add or update statusLine configuration
 settings['statusLine'] = {
     "type": "command",
     "command": "python3 ~/.claude/scripts/jasonchaffee-statusline.py",
     "padding": 0
 }
 
-# Write back with proper formatting
 with open(settings_file, 'w') as f:
     json.dump(settings, f, indent=2)
     f.write('\n')
 PYTHON_SCRIPT
+    else
+        # Fallback: create new settings file with statusLine
+        echo '{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "statusLine": {
+    "type": "command",
+    "command": "python3 ~/.claude/scripts/jasonchaffee-statusline.py",
+    "padding": 0
+  }
+}' > "${SETTINGS_FILE}"
+    fi
 
     # Fix ownership
     chown -R "${TARGET_USER}:${TARGET_USER}" "${TARGET_HOME}/.claude" 2>/dev/null || true

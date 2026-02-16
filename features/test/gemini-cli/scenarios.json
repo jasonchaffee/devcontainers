@@ -1,0 +1,28 @@
+{
+  "skip_install": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "gemini-cli": {
+        "install": false
+      }
+    }
+  },
+  "debian": {
+    "image": "mcr.microsoft.com/devcontainers/base:debian",
+    "features": {
+      "gemini-cli": {}
+    }
+  },
+  "alpine": {
+    "image": "mcr.microsoft.com/devcontainers/base:alpine",
+    "features": {
+      "gemini-cli": {}
+    }
+  },
+  "fedora": {
+    "image": "fedora:latest",
+    "features": {
+      "gemini-cli": {}
+    }
+  }
+}

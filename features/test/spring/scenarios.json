@@ -1,0 +1,28 @@
+{
+  "with_spring_cli": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "spring": {
+        "installSpringCli": true
+      }
+    }
+  },
+  "debian": {
+    "image": "mcr.microsoft.com/devcontainers/base:debian",
+    "features": {
+      "spring": {}
+    }
+  },
+  "alpine": {
+    "image": "mcr.microsoft.com/devcontainers/base:alpine",
+    "features": {
+      "spring": {}
+    }
+  },
+  "fedora": {
+    "image": "fedora:latest",
+    "features": {
+      "spring": {}
+    }
+  }
+}

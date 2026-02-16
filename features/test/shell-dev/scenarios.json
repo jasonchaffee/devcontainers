@@ -1,0 +1,20 @@
+{
+  "debian": {
+    "image": "mcr.microsoft.com/devcontainers/base:debian",
+    "features": {
+      "shell-dev": {}
+    }
+  },
+  "alpine": {
+    "image": "mcr.microsoft.com/devcontainers/base:alpine",
+    "features": {
+      "shell-dev": {}
+    }
+  },
+  "fedora": {
+    "image": "fedora:latest",
+    "features": {
+      "shell-dev": {}
+    }
+  }
+}

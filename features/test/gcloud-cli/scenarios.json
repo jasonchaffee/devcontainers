@@ -1,0 +1,28 @@
+{
+  "minimal_components": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "gcloud-cli": {
+        "installComponents": ""
+      }
+    }
+  },
+  "debian": {
+    "image": "mcr.microsoft.com/devcontainers/base:debian",
+    "features": {
+      "gcloud-cli": {}
+    }
+  },
+  "alpine": {
+    "image": "mcr.microsoft.com/devcontainers/base:alpine",
+    "features": {
+      "gcloud-cli": {}
+    }
+  },
+  "fedora": {
+    "image": "fedora:latest",
+    "features": {
+      "gcloud-cli": {}
+    }
+  }
+}

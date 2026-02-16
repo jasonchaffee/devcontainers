@@ -14,6 +14,8 @@ if ! command -v git &> /dev/null; then
         apt-get install -y --no-install-recommends git
     elif command -v apk &> /dev/null; then
         apk add --no-cache git
+    elif command -v dnf &> /dev/null; then
+        dnf install -y git
     elif command -v yum &> /dev/null; then
         yum install -y git
     fi
@@ -29,6 +31,8 @@ if [ "${INSTALL_ZSH}" = "true" ]; then
             rm -rf /var/lib/apt/lists/*
         elif command -v apk &> /dev/null; then
             apk add --no-cache zsh
+        elif command -v dnf &> /dev/null; then
+            dnf install -y zsh
         elif command -v yum &> /dev/null; then
             yum install -y zsh
         else

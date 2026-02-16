@@ -5,7 +5,13 @@ echo "Installing HTTP Tools..."
 
 # Dependencies (curl, ca-certificates) provided by common-utils via dependsOn
 
-ARCH=$(dpkg --print-architecture)
+# Detect architecture (cross-platform)
+MACHINE_ARCH=$(uname -m)
+case "${MACHINE_ARCH}" in
+    x86_64|amd64) ARCH="amd64" ;;
+    aarch64|arm64) ARCH="arm64" ;;
+    *) echo "Unsupported architecture: ${MACHINE_ARCH}"; exit 1 ;;
+esac
 
 if [ "${INSTALLXH}" = "true" ]; then
     echo "Installing xh..."

@@ -3,18 +3,56 @@ set -e
 
 echo "Installing Shell Development Tools..."
 
-apt-get update
+if command -v apt-get &> /dev/null; then
+    apt-get update
 
-if [ "${INSTALLSHELLCHECK}" = "true" ]; then
-    echo "Installing shellcheck..."
-    apt-get install -y --no-install-recommends shellcheck
+    if [ "${INSTALLSHELLCHECK}" = "true" ]; then
+        echo "Installing shellcheck..."
+        apt-get install -y --no-install-recommends shellcheck
+    fi
+
+    if [ "${INSTALLTLDR}" = "true" ]; then
+        echo "Installing tldr..."
+        apt-get install -y --no-install-recommends tldr
+    fi
+
+    rm -rf /var/lib/apt/lists/*
+elif command -v apk &> /dev/null; then
+    if [ "${INSTALLSHELLCHECK}" = "true" ]; then
+        echo "Installing shellcheck..."
+        apk add --no-cache shellcheck
+    fi
+
+    if [ "${INSTALLTLDR}" = "true" ]; then
+        echo "Installing tldr..."
+        apk add --no-cache tldr
+    fi
+elif command -v dnf &> /dev/null; then
+    if [ "${INSTALLSHELLCHECK}" = "true" ]; then
+        echo "Installing shellcheck..."
+        dnf install -y ShellCheck
+    fi
+
+    if [ "${INSTALLTLDR}" = "true" ]; then
+        echo "Installing tldr..."
+        dnf install -y tldr
+    fi
+elif command -v yum &> /dev/null; then
+    if [ "${INSTALLSHELLCHECK}" = "true" ]; then
+        echo "Installing shellcheck..."
+        yum install -y epel-release
+        yum install -y ShellCheck
+    fi
+
+    if [ "${INSTALLTLDR}" = "true" ]; then
+        echo "Installing tldr..."
+        # tldr not available in yum, install via npm if node available
+        if command -v npm &> /dev/null; then
+            npm install -g tldr
+        else
+            echo "Warning: tldr requires npm on RHEL/CentOS, skipping..."
+        fi
+    fi
 fi
-
-if [ "${INSTALLTLDR}" = "true" ]; then
-    echo "Installing tldr..."
-    apt-get install -y --no-install-recommends tldr
-fi
-
-rm -rf /var/lib/apt/lists/*
 
 echo "Shell Development Tools installed successfully!"

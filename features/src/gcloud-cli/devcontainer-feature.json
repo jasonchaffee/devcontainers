@@ -18,5 +18,5 @@
       "default": "gcloud-crc32c,gke-gcloud-auth-plugin,skaffold",
       "description": "Comma-separated list of additional components to install (e.g., gke-gcloud-auth-plugin,cloud-spanner-emulator)"
     }
-  },
+  }
 }

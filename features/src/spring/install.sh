@@ -5,6 +5,20 @@ INSTALLSPRINGCLI="${INSTALLSPRINGCLI:-false}"
 
 echo "Installing Spring Boot development tools..."
 
+# Install curl if not present (needed for Spring CLI download)
+if ! command -v curl &> /dev/null; then
+    echo "Installing curl..."
+    if command -v apt-get &> /dev/null; then
+        apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
+    elif command -v apk &> /dev/null; then
+        apk add --no-cache curl ca-certificates
+    elif command -v dnf &> /dev/null; then
+        dnf install -y curl ca-certificates
+    elif command -v yum &> /dev/null; then
+        yum install -y curl ca-certificates
+    fi
+fi
+
 # Spring CLI installation (optional)
 if [ "${INSTALLSPRINGCLI}" = "true" ]; then
     echo "Installing Spring CLI..."

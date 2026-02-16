@@ -110,6 +110,11 @@
     // "ghcr.io/jasonchaffee/devcontainers/jmeter:1": {}
 
     // =========================================================================
+    // Optional: Homebrew (installHomebrew: false)
+    // =========================================================================
+    // "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {}
+
+    // =========================================================================
     // JetBrains (installJetBrains: true)
     // =========================================================================
     "ghcr.io/jasonchaffee/devcontainers/jetbrains:1": {},
