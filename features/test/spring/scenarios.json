@@ -13,12 +13,6 @@
       "spring": {}
     }
   },
-  "alpine": {
-    "image": "mcr.microsoft.com/devcontainers/base:alpine",
-    "features": {
-      "spring": {}
-    }
-  },
   "fedora": {
     "image": "fedora:latest",
     "features": {

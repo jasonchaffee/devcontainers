@@ -13,12 +13,6 @@
       "jmeter": {}
     }
   },
-  "alpine": {
-    "image": "mcr.microsoft.com/devcontainers/base:alpine",
-    "features": {
-      "jmeter": {}
-    }
-  },
   "fedora": {
     "image": "fedora:latest",
     "features": {
