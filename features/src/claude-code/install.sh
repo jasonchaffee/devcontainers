@@ -19,6 +19,10 @@ fi
 
 echo "Installing for user: ${TARGET_USER} (home: ${TARGET_HOME})"
 
+# Ensure required directories exist with correct ownership
+mkdir -p "${TARGET_HOME}/.cache" "${TARGET_HOME}/.local/bin"
+chown -R "${TARGET_USER}:${TARGET_USER}" "${TARGET_HOME}/.cache" "${TARGET_HOME}/.local" 2>/dev/null || true
+
 # Install Claude Code using native installer
 # Usage: bash [stable|latest|VERSION]
 INSTALL_CMD="curl -fsSL https://claude.ai/install.sh | bash -s -- ${VERSION}"
