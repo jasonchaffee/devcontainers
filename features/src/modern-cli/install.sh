@@ -39,12 +39,32 @@ if command -v apt-get &> /dev/null; then
 
     if [ "${INSTALLZOXIDE}" = "true" ]; then
         echo "Installing zoxide..."
-        apt-get install -y --no-install-recommends zoxide
+        if apt-cache show zoxide &> /dev/null; then
+            apt-get install -y --no-install-recommends zoxide
+        else
+            echo "zoxide not found in repository, installing via script..."
+            curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash -s -- --bin-dir /usr/local/bin
+        fi
     fi
 
     if [ "${INSTALLDELTA}" = "true" ]; then
         echo "Installing delta..."
-        apt-get install -y --no-install-recommends git-delta
+        if apt-cache show git-delta &> /dev/null; then
+            apt-get install -y --no-install-recommends git-delta
+        else
+            echo "git-delta not found in repository, downloading binary..."
+            DELTA_VERSION=$(curl -fsSL https://api.github.com/repos/dandavison/delta/releases/latest | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+            if [ "$ARCH" = "arm64" ]; then
+                DELTA_FILE="delta-${DELTA_VERSION}-aarch64-unknown-linux-musl.tar.gz"
+                DELTA_DIR="delta-${DELTA_VERSION}-aarch64-unknown-linux-musl"
+            else
+                DELTA_FILE="delta-${DELTA_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+                DELTA_DIR="delta-${DELTA_VERSION}-x86_64-unknown-linux-musl"
+            fi
+            curl -fsSL "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/${DELTA_FILE}" | tar -xz -C /tmp
+            mv "/tmp/${DELTA_DIR}/delta" /usr/local/bin/
+            rm -rf "/tmp/${DELTA_DIR}"
+        fi
     fi
 
     if [ "${INSTALLCOLORDIFF}" = "true" ]; then
@@ -111,12 +131,32 @@ elif command -v dnf &> /dev/null; then
 
     if [ "${INSTALLZOXIDE}" = "true" ]; then
         echo "Installing zoxide..."
-        dnf install -y zoxide
+        if dnf list zoxide &> /dev/null; then
+            dnf install -y zoxide
+        else
+            echo "zoxide not found in repository, installing via script..."
+            curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash -s -- --bin-dir /usr/local/bin
+        fi
     fi
 
     if [ "${INSTALLDELTA}" = "true" ]; then
         echo "Installing delta..."
-        dnf install -y git-delta
+        if dnf list git-delta &> /dev/null; then
+            dnf install -y git-delta
+        else
+            echo "git-delta not found in repository, downloading binary..."
+            DELTA_VERSION=$(curl -fsSL https://api.github.com/repos/dandavison/delta/releases/latest | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+            if [ "$ARCH" = "arm64" ]; then
+                DELTA_FILE="delta-${DELTA_VERSION}-aarch64-unknown-linux-musl.tar.gz"
+                DELTA_DIR="delta-${DELTA_VERSION}-aarch64-unknown-linux-musl"
+            else
+                DELTA_FILE="delta-${DELTA_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+                DELTA_DIR="delta-${DELTA_VERSION}-x86_64-unknown-linux-musl"
+            fi
+            curl -fsSL "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/${DELTA_FILE}" | tar -xz -C /tmp
+            mv "/tmp/${DELTA_DIR}/delta" /usr/local/bin/
+            rm -rf "/tmp/${DELTA_DIR}"
+        fi
     fi
 
     if [ "${INSTALLCOLORDIFF}" = "true" ]; then
@@ -148,12 +188,7 @@ elif command -v yum &> /dev/null; then
 
     if [ "${INSTALLZOXIDE}" = "true" ]; then
         echo "Installing zoxide..."
-        # zoxide not in EPEL, install via cargo if available
-        if command -v cargo &> /dev/null; then
-            cargo install zoxide --locked
-        else
-            echo "Warning: zoxide requires cargo on RHEL/CentOS, skipping..."
-        fi
+        curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash -s -- --bin-dir /usr/local/bin
     fi
 
     if [ "${INSTALLDELTA}" = "true" ]; then
