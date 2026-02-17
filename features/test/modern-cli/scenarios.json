@@ -16,5 +16,17 @@
     "features": {
       "modern-cli": {}
     }
+  },
+  "almalinux": {
+    "image": "almalinux:9",
+    "features": {
+      "modern-cli": {}
+    }
+  },
+  "rockylinux": {
+    "image": "rockylinux:9",
+    "features": {
+      "modern-cli": {}
+    }
   }
 }

@@ -24,5 +24,17 @@
     "features": {
       "terminal-extras": {}
     }
+  },
+  "almalinux": {
+    "image": "almalinux:9",
+    "features": {
+      "terminal-extras": {}
+    }
+  },
+  "rockylinux": {
+    "image": "rockylinux:9",
+    "features": {
+      "terminal-extras": {}
+    }
   }
 }

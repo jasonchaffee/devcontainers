@@ -24,5 +24,17 @@
     "features": {
       "antidote": {}
     }
+  },
+  "almalinux": {
+    "image": "almalinux:9",
+    "features": {
+      "antidote": {}
+    }
+  },
+  "rockylinux": {
+    "image": "rockylinux:9",
+    "features": {
+      "antidote": {}
+    }
   }
 }

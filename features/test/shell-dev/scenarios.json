@@ -16,5 +16,17 @@
     "features": {
       "shell-dev": {}
     }
+  },
+  "almalinux": {
+    "image": "almalinux:9",
+    "features": {
+      "shell-dev": {}
+    }
+  },
+  "rockylinux": {
+    "image": "rockylinux:9",
+    "features": {
+      "shell-dev": {}
+    }
   }
 }

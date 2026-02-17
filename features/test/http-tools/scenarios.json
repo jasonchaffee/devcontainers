@@ -16,5 +16,17 @@
     "features": {
       "http-tools": {}
     }
+  },
+  "almalinux": {
+    "image": "almalinux:9",
+    "features": {
+      "http-tools": {}
+    }
+  },
+  "rockylinux": {
+    "image": "rockylinux:9",
+    "features": {
+      "http-tools": {}
+    }
   }
 }

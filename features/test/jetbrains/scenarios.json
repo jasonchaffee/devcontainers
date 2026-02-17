@@ -16,5 +16,17 @@
     "features": {
       "jetbrains": {}
     }
+  },
+  "almalinux": {
+    "image": "almalinux:9",
+    "features": {
+      "jetbrains": {}
+    }
+  },
+  "rockylinux": {
+    "image": "rockylinux:9",
+    "features": {
+      "jetbrains": {}
+    }
   }
 }

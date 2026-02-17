@@ -24,5 +24,17 @@
     "features": {
       "gcloud-cli": {}
     }
+  },
+  "almalinux": {
+    "image": "almalinux:9",
+    "features": {
+      "gcloud-cli": {}
+    }
+  },
+  "rockylinux": {
+    "image": "rockylinux:9",
+    "features": {
+      "gcloud-cli": {}
+    }
   }
 }
