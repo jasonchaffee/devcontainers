@@ -8,7 +8,8 @@
     "ghcr.io/devcontainers/features/common-utils:2": {
       "installOhMyZsh": false,
       "installOhMyZshConfig": false
-    }
+    },
+    "ghcr.io/devcontainers/features/node:1": {}
   },
   "options": {
     "version": {
