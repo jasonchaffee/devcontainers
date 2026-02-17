@@ -19,7 +19,7 @@
     "installCrc32c": {
       "type": "boolean",
       "default": true,
-      "description": "Install gcloud-crc32c (highly recommended for large file transfers)"
+      "description": "Install gcloud-crc32c (recommended for performance)"
     },
     "installGkeGcloudAuthPlugin": {
       "type": "boolean",
@@ -36,55 +36,35 @@
       "default": false,
       "description": "Install kubectl"
     },
-    "installAnthosAuth": {
-      "type": "boolean",
-      "default": false,
-      "description": "Install anthos-auth"
-    },
     "installBeta": {
       "type": "boolean",
       "default": false,
-      "description": "Install gcloud beta components"
+      "description": "Install gcloud beta commands"
     },
     "installAlpha": {
       "type": "boolean",
       "default": false,
-      "description": "Install gcloud alpha components"
+      "description": "Install gcloud alpha commands"
     },
-    "installPubsubEmulator": {
+    "installEmulators": {
       "type": "boolean",
       "default": false,
-      "description": "Install pubsub-emulator"
-    },
-    "installCloudSpannerEmulator": {
-      "type": "boolean",
-      "default": false,
-      "description": "Install cloud-spanner-emulator"
-    },
-    "installBigtable": {
-      "type": "boolean",
-      "default": false,
-      "description": "Install bigtable (emulator and tools)"
+      "description": "Install emulators (Pub/Sub, Spanner, Bigtable)"
     },
     "installAppEngineJava": {
       "type": "boolean",
       "default": false,
-      "description": "Install app-engine-java"
+      "description": "Install app-engine-java extensions"
     },
     "installTerraformTools": {
       "type": "boolean",
       "default": false,
       "description": "Install terraform-tools"
     },
-    "installKpt": {
-      "type": "boolean",
-      "default": false,
-      "description": "Install kpt"
-    },
     "installComponents": {
       "type": "string",
       "default": "",
-      "description": "Additional comma-separated list of components to install"
+      "description": "Additional comma-separated components to install"
     }
   }
 }

@@ -10,15 +10,15 @@ COMPONENTS=""
 [ "${INSTALLGKEGCLOUDAUTHPLUGIN}" = "true" ] && COMPONENTS="${COMPONENTS},gke-gcloud-auth-plugin"
 [ "${INSTALLSKAFFOLD}" = "true" ] && COMPONENTS="${COMPONENTS},skaffold"
 [ "${INSTALLKUBECTL}" = "true" ] && COMPONENTS="${COMPONENTS},kubectl"
-[ "${INSTALLANTHOSAUTH}" = "true" ] && COMPONENTS="${COMPONENTS},anthos-auth"
 [ "${INSTALLBETA}" = "true" ] && COMPONENTS="${COMPONENTS},beta"
 [ "${INSTALLALPHA}" = "true" ] && COMPONENTS="${COMPONENTS},alpha"
-[ "${INSTALLPUBSUBEMULATOR}" = "true" ] && COMPONENTS="${COMPONENTS},pubsub-emulator"
-[ "${INSTALLCLOUDSPANNEREMULATOR}" = "true" ] && COMPONENTS="${COMPONENTS},cloud-spanner-emulator"
-[ "${INSTALLBIGTABLE}" = "true" ] && COMPONENTS="${COMPONENTS},bigtable"
 [ "${INSTALLAPPENGINEJAVA}" = "true" ] && COMPONENTS="${COMPONENTS},app-engine-java"
 [ "${INSTALLTERRAFORMTOOLS}" = "true" ] && COMPONENTS="${COMPONENTS},terraform-tools"
-[ "${INSTALLKPT}" = "true" ] && COMPONENTS="${COMPONENTS},kpt"
+
+# Grouped emulators
+if [ "${INSTALLEMULATORS}" = "true" ]; then
+    COMPONENTS="${COMPONENTS},pubsub-emulator,cloud-spanner-emulator,bigtable"
+fi
 
 # Add any additional components provided as a string
 if [ -n "${INSTALL_COMPONENTS}" ]; then

@@ -104,8 +104,8 @@
     //   "installSkaffold": "${templateOption:gcloudInstallSkaffold}",
     //   "installKubectl": "${templateOption:gcloudInstallKubectl}",
     //   "installBeta": "${templateOption:gcloudInstallBeta}",
-    //   "installPubsubEmulator": "${templateOption:gcloudInstallPubsubEmulator}",
-    //   "installCloudSpannerEmulator": "${templateOption:gcloudInstallCloudSpannerEmulator}",
+    //   "installEmulators": "${templateOption:gcloudInstallEmulators}",
+    //   "installAppEngineJava": "${templateOption:gcloudInstallAppEngineJava}",
     //   "installComponents": "${templateOption:gcloudInstallComponents}"
     // }
 

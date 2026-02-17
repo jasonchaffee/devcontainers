@@ -166,17 +166,17 @@
     "gcloudInstallBeta": {
       "type": "boolean",
       "default": false,
-      "description": "Install gcloud beta components"
+      "description": "Install gcloud beta commands"
     },
-    "gcloudInstallPubsubEmulator": {
+    "gcloudInstallEmulators": {
       "type": "boolean",
       "default": false,
-      "description": "Install pubsub-emulator"
+      "description": "Install gcloud emulators (Pub/Sub, Spanner, Bigtable)"
     },
-    "gcloudInstallCloudSpannerEmulator": {
+    "gcloudInstallAppEngineJava": {
       "type": "boolean",
       "default": false,
-      "description": "Install cloud-spanner-emulator"
+      "description": "Install app-engine-java extensions"
     },
     "gcloudInstallComponents": {
       "type": "string",
