@@ -24,7 +24,19 @@ if command -v apt-get &> /dev/null; then
 
     if [ "${INSTALLBTOP}" = "true" ]; then
         echo "Installing btop..."
-        apt-get install -y --no-install-recommends btop
+        if apt-cache show btop &> /dev/null; then
+            apt-get install -y --no-install-recommends btop
+        else
+            echo "btop not found in repository, downloading binary..."
+            if [ "$ARCH" = "arm64" ]; then
+                BTOP_ARCH="aarch64"
+            else
+                BTOP_ARCH="x86_64"
+            fi
+            curl -fsSL "https://github.com/aristocratos/btop/releases/latest/download/btop-${BTOP_ARCH}-linux-musl.tbz" | tar -xj -C /tmp
+            cd "/tmp/btop" && make install PREFIX=/usr/local
+            cd - && rm -rf /tmp/btop
+        fi
     fi
 
     rm -rf /var/lib/apt/lists/*
@@ -46,7 +58,19 @@ elif command -v dnf &> /dev/null; then
 
     if [ "${INSTALLBTOP}" = "true" ]; then
         echo "Installing btop..."
-        dnf install -y btop
+        if dnf list btop &> /dev/null; then
+            dnf install -y btop
+        else
+            echo "btop not found in repository, downloading binary..."
+            if [ "$ARCH" = "arm64" ]; then
+                BTOP_ARCH="aarch64"
+            else
+                BTOP_ARCH="x86_64"
+            fi
+            curl -fsSL "https://github.com/aristocratos/btop/releases/latest/download/btop-${BTOP_ARCH}-linux-musl.tbz" | tar -xj -C /tmp
+            cd "/tmp/btop" && make install PREFIX=/usr/local
+            cd - && rm -rf /tmp/btop
+        fi
     fi
 elif command -v yum &> /dev/null; then
     if [ "${INSTALLTMUX}" = "true" ]; then
@@ -56,8 +80,19 @@ elif command -v yum &> /dev/null; then
 
     if [ "${INSTALLBTOP}" = "true" ]; then
         echo "Installing btop..."
-        yum install -y epel-release
-        yum install -y btop
+        if yum list btop &> /dev/null; then
+            yum install -y btop
+        else
+            echo "btop not found in repository, downloading binary..."
+            if [ "$ARCH" = "arm64" ]; then
+                BTOP_ARCH="aarch64"
+            else
+                BTOP_ARCH="x86_64"
+            fi
+            curl -fsSL "https://github.com/aristocratos/btop/releases/latest/download/btop-${BTOP_ARCH}-linux-musl.tbz" | tar -xj -C /tmp
+            cd "/tmp/btop" && make install PREFIX=/usr/local
+            cd - && rm -rf /tmp/btop
+        fi
     fi
 fi
 
