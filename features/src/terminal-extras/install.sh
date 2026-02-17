@@ -33,7 +33,7 @@ if command -v apt-get &> /dev/null; then
             else
                 BTOP_ARCH="x86_64"
             fi
-            curl -fsSL "https://github.com/aristocratos/btop/releases/latest/download/btop-${BTOP_ARCH}-linux-musl.tbz" | tar -xj -C /tmp
+            curl -fsSL "https://github.com/aristocratos/btop/releases/latest/download/btop-${BTOP_ARCH}-unknown-linux-musl.tbz" | tar -xj -C /tmp
             cd "/tmp/btop" && make install PREFIX=/usr/local
             cd - && rm -rf /tmp/btop
         fi
@@ -67,7 +67,7 @@ elif command -v dnf &> /dev/null; then
             else
                 BTOP_ARCH="x86_64"
             fi
-            curl -fsSL "https://github.com/aristocratos/btop/releases/latest/download/btop-${BTOP_ARCH}-linux-musl.tbz" | tar -xj -C /tmp
+            curl -fsSL "https://github.com/aristocratos/btop/releases/latest/download/btop-${BTOP_ARCH}-unknown-linux-musl.tbz" | tar -xj -C /tmp
             cd "/tmp/btop" && make install PREFIX=/usr/local
             cd - && rm -rf /tmp/btop
         fi
@@ -89,7 +89,7 @@ elif command -v yum &> /dev/null; then
             else
                 BTOP_ARCH="x86_64"
             fi
-            curl -fsSL "https://github.com/aristocratos/btop/releases/latest/download/btop-${BTOP_ARCH}-linux-musl.tbz" | tar -xj -C /tmp
+            curl -fsSL "https://github.com/aristocratos/btop/releases/latest/download/btop-${BTOP_ARCH}-unknown-linux-musl.tbz" | tar -xj -C /tmp
             cd "/tmp/btop" && make install PREFIX=/usr/local
             cd - && rm -rf /tmp/btop
         fi
