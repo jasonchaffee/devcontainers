@@ -10,5 +10,8 @@
       "default": "latest",
       "description": "Gemini CLI version to install (e.g., '0.1.0' or 'latest')"
     }
+  },
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/node:1": {}
   }
 }

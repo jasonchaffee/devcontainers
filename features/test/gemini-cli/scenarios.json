@@ -13,12 +13,6 @@
       "gemini-cli": {}
     }
   },
-  "alpine": {
-    "image": "mcr.microsoft.com/devcontainers/base:alpine",
-    "features": {
-      "gemini-cli": {}
-    }
-  },
   "fedora": {
     "image": "fedora:latest",
     "features": {

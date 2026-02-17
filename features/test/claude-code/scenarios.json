@@ -21,12 +21,6 @@
       "claude-code": {}
     }
   },
-  "alpine": {
-    "image": "mcr.microsoft.com/devcontainers/base:alpine",
-    "features": {
-      "claude-code": {}
-    }
-  },
   "fedora": {
     "image": "fedora:latest",
     "features": {

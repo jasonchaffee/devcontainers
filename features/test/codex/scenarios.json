@@ -13,12 +13,6 @@
       "codex": {}
     }
   },
-  "alpine": {
-    "image": "mcr.microsoft.com/devcontainers/base:alpine",
-    "features": {
-      "codex": {}
-    }
-  },
   "fedora": {
     "image": "fedora:latest",
     "features": {
