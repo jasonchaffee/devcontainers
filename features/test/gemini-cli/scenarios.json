@@ -3,7 +3,7 @@
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
       "gemini-cli": {
-        "version": "0.1.0"
+        "version": "0.28.2"
       }
     }
   },

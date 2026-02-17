@@ -3,7 +3,7 @@
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
       "claude-code": {
-        "version": "2.1.0"
+        "version": "2.1.20"
       }
     }
   },

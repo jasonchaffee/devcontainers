@@ -3,7 +3,7 @@
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
       "codex": {
-        "version": "0.1.2505090827"
+        "version": "0.1.2505291658"
       }
     }
   },
