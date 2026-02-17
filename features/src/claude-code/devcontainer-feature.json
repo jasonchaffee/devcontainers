@@ -1,6 +1,6 @@
 {
   "id": "claude-code",
-  "version": "1.0.2",
+  "version": "1.0.1",
   "name": "Claude Code CLI",
   "description": "Installs the Claude Code CLI for AI-assisted development using the native installer.",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/claude-code",
