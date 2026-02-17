@@ -61,9 +61,13 @@ if [ -z "${CLAUDE_BIN}" ] && ! command -v claude &> /dev/null; then
     echo "Warning: Claude Code CLI installation could not be verified"
 fi
 
-# Install status line feature (optional)
+# Install status line feature (optional, non-fatal if it fails)
 if [ "${INSTALLSTATUSLINE}" = "true" ]; then
     echo "Installing status line feature from GitHub..."
-    curl -fsSL https://raw.githubusercontent.com/jasonchaffee/ai/main/claude/settings/statuslines/jasonchaffee/install.sh | bash
-    chown -R "${TARGET_USER}:${TARGET_USER}" "${TARGET_HOME}/.claude" 2>/dev/null || true
+    if curl -fsSL https://raw.githubusercontent.com/jasonchaffee/ai/main/claude/settings/statuslines/jasonchaffee/install.sh | bash; then
+        chown -R "${TARGET_USER}:${TARGET_USER}" "${TARGET_HOME}/.claude" 2>/dev/null || true
+        echo "Status line installed successfully"
+    else
+        echo "Warning: Status line installation failed (network may be restricted). Skipping."
+    fi
 fi
