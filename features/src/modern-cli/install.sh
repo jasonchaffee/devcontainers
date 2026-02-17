@@ -15,7 +15,8 @@ esac
 
 # Install package manager tools
 if command -v apt-get &> /dev/null; then
-    apt-get update
+    echo "Updating apt-get..."
+    apt-get update || (sleep 5 && apt-get update) || (sleep 10 && apt-get update)
 
     if [ "${INSTALLBAT}" = "true" ]; then
         echo "Installing bat..."

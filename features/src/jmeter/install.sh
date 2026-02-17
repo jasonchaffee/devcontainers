@@ -10,7 +10,9 @@ echo "Installing Apache JMeter ${VERSION}..."
 if ! command -v curl &> /dev/null; then
     echo "Installing curl..."
     if command -v apt-get &> /dev/null; then
-        apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
+        echo "Updating apt-get..."
+        apt-get update || (sleep 5 && apt-get update) || (sleep 10 && apt-get update)
+        apt-get install -y --no-install-recommends curl ca-certificates
     elif command -v apk &> /dev/null; then
         apk add --no-cache curl ca-certificates
     elif command -v dnf &> /dev/null; then

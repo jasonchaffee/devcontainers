@@ -4,7 +4,8 @@ set -e
 echo "Installing Shell Development Tools..."
 
 if command -v apt-get &> /dev/null; then
-    apt-get update
+    echo "Updating apt-get..."
+    apt-get update || (sleep 5 && apt-get update) || (sleep 10 && apt-get update)
 
     if [ "${INSTALLSHELLCHECK}" = "true" ]; then
         echo "Installing shellcheck..."

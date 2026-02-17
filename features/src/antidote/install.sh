@@ -10,7 +10,8 @@ echo "Installing Zsh with Antidote plugin manager..."
 if ! command -v git &> /dev/null; then
     echo "Installing git (required for Antidote)..."
     if command -v apt-get &> /dev/null; then
-        apt-get update
+        echo "Updating apt-get..."
+        apt-get update || (sleep 5 && apt-get update) || (sleep 10 && apt-get update)
         apt-get install -y --no-install-recommends git
     elif command -v apk &> /dev/null; then
         apk add --no-cache git

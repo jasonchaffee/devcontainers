@@ -16,7 +16,8 @@ esac
 
 # Install dependencies
 if command -v apt-get &> /dev/null; then
-    apt-get update
+    echo "Updating apt-get..."
+    apt-get update || (sleep 5 && apt-get update) || (sleep 10 && apt-get update)
     apt-get install -y --no-install-recommends curl python3 gnupg
     rm -rf /var/lib/apt/lists/*
 elif command -v apk &> /dev/null; then
