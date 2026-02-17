@@ -6,9 +6,39 @@ INSTALLSTATUSLINE="${INSTALLSTATUSLINE:-true}"
 
 echo "Installing Claude Code CLI (version: ${VERSION})..."
 
-# Dependencies (curl, ca-certificates) provided by common-utils via dependsOn
 
-# Determine target user (features run as root, but we want to install for the remote user)
+
+# Install Node.js if not present
+
+if ! command -v npm &> /dev/null; then
+
+    echo "Node.js/npm not found, installing..."
+
+    if command -v apt-get &> /dev/null; then
+
+        apt-get update && apt-get install -y nodejs npm
+
+    elif command -v apk &> /dev/null; then
+
+        apk add --no-cache nodejs npm
+
+    elif command -v dnf &> /dev/null; then
+
+        dnf install -y nodejs npm
+
+    elif command -v yum &> /dev/null; then
+
+        yum install -y nodejs npm
+
+    fi
+
+fi
+
+
+
+# Determine target user
+
+ (features run as root, but we want to install for the remote user)
 if [ -n "${_REMOTE_USER}" ] && [ "${_REMOTE_USER}" != "root" ]; then
     TARGET_USER="${_REMOTE_USER}"
     TARGET_HOME=$(eval echo ~${_REMOTE_USER})
