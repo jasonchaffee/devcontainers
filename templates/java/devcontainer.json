@@ -99,7 +99,14 @@
     // =========================================================================
     // "ghcr.io/jasonchaffee/devcontainers/gcloud-cli:1": {
     //   "version": "${templateOption:gcloudVersion}",
-    //   "installComponents": "${templateOption:gcloudComponents}"
+    //   "installCrc32c": "${templateOption:gcloudInstallCrc32c}",
+    //   "installGkeGcloudAuthPlugin": "${templateOption:gcloudInstallGkeGcloudAuthPlugin}",
+    //   "installSkaffold": "${templateOption:gcloudInstallSkaffold}",
+    //   "installKubectl": "${templateOption:gcloudInstallKubectl}",
+    //   "installBeta": "${templateOption:gcloudInstallBeta}",
+    //   "installPubsubEmulator": "${templateOption:gcloudInstallPubsubEmulator}",
+    //   "installCloudSpannerEmulator": "${templateOption:gcloudInstallCloudSpannerEmulator}",
+    //   "installComponents": "${templateOption:gcloudInstallComponents}"
     // }
 
     // =========================================================================

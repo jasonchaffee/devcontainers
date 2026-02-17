@@ -143,10 +143,45 @@
       "default": "latest",
       "description": "Google Cloud CLI version (e.g., '450.0.0' or 'latest')"
     },
-    "gcloudComponents": {
+    "gcloudInstallCrc32c": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install gcloud-crc32c (for large file transfers)"
+    },
+    "gcloudInstallGkeGcloudAuthPlugin": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install gke-gcloud-auth-plugin"
+    },
+    "gcloudInstallSkaffold": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install skaffold"
+    },
+    "gcloudInstallKubectl": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install kubectl via gcloud"
+    },
+    "gcloudInstallBeta": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install gcloud beta components"
+    },
+    "gcloudInstallPubsubEmulator": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install pubsub-emulator"
+    },
+    "gcloudInstallCloudSpannerEmulator": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install cloud-spanner-emulator"
+    },
+    "gcloudInstallComponents": {
       "type": "string",
-      "default": "gcloud-crc32c,gke-gcloud-auth-plugin,skaffold",
-      "description": "Comma-separated gcloud components to install"
+      "default": "",
+      "description": "Additional comma-separated gcloud components to install"
     }
   }
 }

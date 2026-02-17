@@ -4,7 +4,31 @@ set -e
 VERSION="${VERSION:-latest}"
 INSTALL_COMPONENTS="${INSTALLCOMPONENTS:-}"
 
-echo "Installing Google Cloud CLI..."
+# Components list
+COMPONENTS=""
+[ "${INSTALLCRC32C}" = "true" ] && COMPONENTS="${COMPONENTS},gcloud-crc32c"
+[ "${INSTALLGKEGCLOUDAUTHPLUGIN}" = "true" ] && COMPONENTS="${COMPONENTS},gke-gcloud-auth-plugin"
+[ "${INSTALLSKAFFOLD}" = "true" ] && COMPONENTS="${COMPONENTS},skaffold"
+[ "${INSTALLKUBECTL}" = "true" ] && COMPONENTS="${COMPONENTS},kubectl"
+[ "${INSTALLANTHOSAUTH}" = "true" ] && COMPONENTS="${COMPONENTS},anthos-auth"
+[ "${INSTALLBETA}" = "true" ] && COMPONENTS="${COMPONENTS},beta"
+[ "${INSTALLALPHA}" = "true" ] && COMPONENTS="${COMPONENTS},alpha"
+[ "${INSTALLPUBSUBEMULATOR}" = "true" ] && COMPONENTS="${COMPONENTS},pubsub-emulator"
+[ "${INSTALLCLOUDSPANNEREMULATOR}" = "true" ] && COMPONENTS="${COMPONENTS},cloud-spanner-emulator"
+[ "${INSTALLBIGTABLE}" = "true" ] && COMPONENTS="${COMPONENTS},bigtable"
+[ "${INSTALLAPPENGINEJAVA}" = "true" ] && COMPONENTS="${COMPONENTS},app-engine-java"
+[ "${INSTALLTERRAFORMTOOLS}" = "true" ] && COMPONENTS="${COMPONENTS},terraform-tools"
+[ "${INSTALLKPT}" = "true" ] && COMPONENTS="${COMPONENTS},kpt"
+
+# Add any additional components provided as a string
+if [ -n "${INSTALL_COMPONENTS}" ]; then
+    COMPONENTS="${COMPONENTS},${INSTALL_COMPONENTS}"
+fi
+
+# Clean up component list (remove leading comma if present)
+COMPONENTS=$(echo "${COMPONENTS}" | sed 's/^,//')
+
+echo "Installing Google Cloud CLI (version: ${VERSION})..."
 
 # Detect architecture
 ARCH=$(uname -m)
@@ -48,10 +72,10 @@ ln -sf /opt/google-cloud-sdk/bin/gsutil /usr/local/bin/gsutil
 ln -sf /opt/google-cloud-sdk/bin/bq /usr/local/bin/bq
 
 # Install additional components if specified
-if [ -n "${INSTALL_COMPONENTS}" ]; then
-    echo "Installing additional components: ${INSTALL_COMPONENTS}"
-    IFS=',' read -ra COMPONENTS <<< "${INSTALL_COMPONENTS}"
-    for component in "${COMPONENTS[@]}"; do
+if [ -n "${COMPONENTS}" ]; then
+    echo "Installing components: ${COMPONENTS}"
+    IFS=',' read -ra COMP_LIST <<< "${COMPONENTS}"
+    for component in "${COMP_LIST[@]}"; do
         /opt/google-cloud-sdk/bin/gcloud components install "${component}" --quiet
     done
 fi
