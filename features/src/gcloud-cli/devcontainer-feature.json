@@ -1,6 +1,6 @@
 {
   "id": "gcloud-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Google Cloud CLI",
   "description": "Installs Google Cloud CLI (gcloud) for GCP operations.",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/gcloud-cli",
@@ -28,7 +28,7 @@
     },
     "installSkaffold": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "description": "Install skaffold"
     },
     "installKubectl": {
