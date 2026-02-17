@@ -76,7 +76,10 @@ if [ -n "${COMPONENTS}" ]; then
     echo "Installing components: ${COMPONENTS}"
     IFS=',' read -ra COMP_LIST <<< "${COMPONENTS}"
     for component in "${COMP_LIST[@]}"; do
-        /opt/google-cloud-sdk/bin/gcloud components install "${component}" --quiet
+        echo "Installing component: ${component}..."
+        /opt/google-cloud-sdk/bin/gcloud components install "${component}" --quiet || \
+        (sleep 5 && /opt/google-cloud-sdk/bin/gcloud components install "${component}" --quiet) || \
+        (sleep 10 && /opt/google-cloud-sdk/bin/gcloud components install "${component}" --quiet)
     done
 fi
 
