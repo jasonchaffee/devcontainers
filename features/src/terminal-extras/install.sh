@@ -56,13 +56,13 @@ elif command -v apk &> /dev/null; then
 elif command -v dnf &> /dev/null; then
     if [ "${INSTALLTMUX}" = "true" ]; then
         echo "Installing tmux..."
-        dnf install -y tmux
+        dnf install -y --allowerasing tmux
     fi
 
     if [ "${INSTALLBTOP}" = "true" ]; then
         echo "Installing btop..."
         if dnf list btop &> /dev/null; then
-            dnf install -y btop
+            dnf install -y --allowerasing btop
         else
             echo "btop not found in repository, downloading binary..."
             if [ "$ARCH" = "arm64" ]; then
@@ -80,13 +80,13 @@ elif command -v dnf &> /dev/null; then
 elif command -v yum &> /dev/null; then
     if [ "${INSTALLTMUX}" = "true" ]; then
         echo "Installing tmux..."
-        yum install -y tmux
+        yum install -y --allowerasing tmux
     fi
 
     if [ "${INSTALLBTOP}" = "true" ]; then
         echo "Installing btop..."
         if yum list btop &> /dev/null; then
-            yum install -y btop
+            yum install -y --allowerasing btop
         else
             echo "btop not found in repository, downloading binary..."
             if [ "$ARCH" = "arm64" ]; then

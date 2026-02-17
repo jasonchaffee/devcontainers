@@ -16,9 +16,9 @@ if ! command -v curl &> /dev/null; then
     elif command -v apk &> /dev/null; then
         apk add --no-cache curl ca-certificates
     elif command -v dnf &> /dev/null; then
-        dnf install -y curl ca-certificates
+        dnf install -y --allowerasing curl ca-certificates
     elif command -v yum &> /dev/null; then
-        yum install -y curl ca-certificates
+        yum install -y --allowerasing curl ca-certificates
     fi
 fi
 

@@ -16,9 +16,9 @@ if ! command -v git &> /dev/null; then
     elif command -v apk &> /dev/null; then
         apk add --no-cache git
     elif command -v dnf &> /dev/null; then
-        dnf install -y git
+        dnf install -y --allowerasing git
     elif command -v yum &> /dev/null; then
-        yum install -y git
+        yum install -y --allowerasing git
     fi
 fi
 
@@ -27,15 +27,16 @@ if [ "${INSTALL_ZSH}" = "true" ]; then
     if ! command -v zsh &> /dev/null; then
         echo "Installing Zsh..."
         if command -v apt-get &> /dev/null; then
-            apt-get update
+            echo "Updating apt-get..."
+            apt-get update || (sleep 5 && apt-get update) || (sleep 10 && apt-get update)
             apt-get install -y --no-install-recommends zsh
             rm -rf /var/lib/apt/lists/*
         elif command -v apk &> /dev/null; then
             apk add --no-cache zsh
         elif command -v dnf &> /dev/null; then
-            dnf install -y zsh
+            dnf install -y --allowerasing zsh
         elif command -v yum &> /dev/null; then
-            yum install -y zsh
+            yum install -y --allowerasing zsh
         else
             echo "ERROR: Could not install Zsh - unsupported package manager"
             exit 1

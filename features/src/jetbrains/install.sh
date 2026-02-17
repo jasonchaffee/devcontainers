@@ -37,7 +37,7 @@ elif command -v apk &> /dev/null; then
         libxi \
         freetype
 elif command -v dnf &> /dev/null; then
-    dnf install -y \
+    dnf install -y --allowerasing \
         curl \
         unzip \
         procps-ng \
@@ -47,7 +47,7 @@ elif command -v dnf &> /dev/null; then
         libXi \
         freetype
 elif command -v yum &> /dev/null; then
-    yum install -y \
+    yum install -y --allowerasing \
         curl \
         unzip \
         procps \

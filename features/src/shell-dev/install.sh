@@ -31,18 +31,18 @@ elif command -v apk &> /dev/null; then
 elif command -v dnf &> /dev/null; then
     if [ "${INSTALLSHELLCHECK}" = "true" ]; then
         echo "Installing shellcheck..."
-        dnf install -y ShellCheck
+        dnf install -y --allowerasing ShellCheck
     fi
 
     if [ "${INSTALLTLDR}" = "true" ]; then
         echo "Installing tldr..."
-        dnf install -y tldr
+        dnf install -y --allowerasing tldr
     fi
 elif command -v yum &> /dev/null; then
     if [ "${INSTALLSHELLCHECK}" = "true" ]; then
         echo "Installing shellcheck..."
-        yum install -y epel-release
-        yum install -y ShellCheck
+        yum install -y --allowerasing epel-release
+        yum install -y --allowerasing ShellCheck
     fi
 
     if [ "${INSTALLTLDR}" = "true" ]; then

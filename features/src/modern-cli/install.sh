@@ -117,23 +117,23 @@ elif command -v apk &> /dev/null; then
 elif command -v dnf &> /dev/null; then
     if [ "${INSTALLBAT}" = "true" ]; then
         echo "Installing bat..."
-        dnf install -y bat
+        dnf install -y --allowerasing bat
     fi
 
     if [ "${INSTALLFD}" = "true" ]; then
         echo "Installing fd..."
-        dnf install -y fd-find
+        dnf install -y --allowerasing fd-find
     fi
 
     if [ "${INSTALLRIPGREP}" = "true" ]; then
         echo "Installing ripgrep..."
-        dnf install -y ripgrep
+        dnf install -y --allowerasing ripgrep
     fi
 
     if [ "${INSTALLZOXIDE}" = "true" ]; then
         echo "Installing zoxide..."
         if dnf list zoxide &> /dev/null; then
-            dnf install -y zoxide
+            dnf install -y --allowerasing zoxide
         else
             echo "zoxide not found in repository, installing via script..."
             curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash -s -- --bin-dir /usr/local/bin
@@ -143,7 +143,7 @@ elif command -v dnf &> /dev/null; then
     if [ "${INSTALLDELTA}" = "true" ]; then
         echo "Installing delta..."
         if dnf list git-delta &> /dev/null; then
-            dnf install -y git-delta
+            dnf install -y --allowerasing git-delta
         else
             echo "git-delta not found in repository, downloading binary..."
             DELTA_VERSION=$(curl -fsSL https://api.github.com/repos/dandavison/delta/releases/latest | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
@@ -162,29 +162,29 @@ elif command -v dnf &> /dev/null; then
 
     if [ "${INSTALLCOLORDIFF}" = "true" ]; then
         echo "Installing colordiff..."
-        dnf install -y colordiff
+        dnf install -y --allowerasing colordiff
     fi
 
     if [ "${INSTALLFZF}" = "true" ]; then
         echo "Installing fzf..."
-        dnf install -y fzf
+        dnf install -y --allowerasing fzf
     fi
 elif command -v yum &> /dev/null; then
-    yum install -y epel-release
+    yum install -y --allowerasing epel-release
 
     if [ "${INSTALLBAT}" = "true" ]; then
         echo "Installing bat..."
-        yum install -y bat
+        yum install -y --allowerasing bat
     fi
 
     if [ "${INSTALLFD}" = "true" ]; then
         echo "Installing fd..."
-        yum install -y fd-find
+        yum install -y --allowerasing fd-find
     fi
 
     if [ "${INSTALLRIPGREP}" = "true" ]; then
         echo "Installing ripgrep..."
-        yum install -y ripgrep
+        yum install -y --allowerasing ripgrep
     fi
 
     if [ "${INSTALLZOXIDE}" = "true" ]; then
