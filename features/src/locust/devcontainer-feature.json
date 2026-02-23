@@ -1,0 +1,17 @@
+{
+  "id": "locust",
+  "version": "1.0.0",
+  "name": "Locust",
+  "description": "Installs Locust, a modern load testing framework for Python.",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/locust",
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/python:1": {}
+  },
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Locust version to install (e.g., '2.32.4' or 'latest')"
+    }
+  }
+}

@@ -54,7 +54,9 @@
     },
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "minikube": "none"
+    },
 
     // =========================================================================
     // Custom Features
@@ -76,6 +78,10 @@
     "ghcr.io/jasonchaffee/devcontainers/gemini-cli:1": {
       "version": "${templateOption:geminiVersion}"
     },
+
+    // Performance Testing
+    "ghcr.io/grafana/devcontainer-features/k6:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/locust:1": {},
 
     // Google Cloud CLI
     "ghcr.io/jasonchaffee/devcontainers/gcloud-cli:1": {
@@ -200,6 +206,9 @@
   // --------------------------------------------------------------------------
   // Environment Variables
   // --------------------------------------------------------------------------
+  // IMPORTANT: ${localEnv:VAR} reads from the IDE process environment.
+  // IDEs launched from Dock/Spotlight won't have shell env vars.
+  // Set tokens in ~/.zshenv or use launchctl setenv for reliable forwarding.
   "remoteEnv": {
     // =========================================================================
     // AI Tools
@@ -272,12 +281,16 @@
     "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.codex,target=/home/vscode/.codex,type=bind,consistency=cached",
-    //"source=${localEnv:HOME}/.gemini,target=/home/vscode/.gemini,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.gemini,target=/home/vscode/.gemini,type=bind,consistency=cached",
 
     "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached",
 
     // Cloud credentials
     "source=${localEnv:HOME}/.config/gcloud,target=/home/vscode/.config/gcloud,type=bind,consistency=cached",
+
+    // Kubernetes — read-only mount to staging path; post-start.sh copies to
+    // ~/.kube and rewrites 127.0.0.1 → host.docker.internal for devcontainer
+    "source=${localEnv:HOME}/.kube,target=/home/vscode/.kube-host,type=bind,consistency=cached,readonly",
 
     // Gradle cache
     //"source=${localEnv:HOME}/.gradle,target=/home/vscode/.gradle,type=bind,consistency=cached",
@@ -305,13 +318,13 @@
   // Lifecycle Commands
   // --------------------------------------------------------------------------
   // Runs on host BEFORE container starts - create directories to avoid root ownership issues
-  "initializeCommand": "mkdir -p ~/.m2 ~/.claude ~/.codex ~/.gemini ~/.config/gcloud ~/.config/gh ~/.gradle",
+  "initializeCommand": "mkdir -p ~/.m2 ~/.kube ~/.claude ~/.codex ~/.gemini ~/.config/gcloud ~/.config/gh ~/.gradle",
 
   // Runs ONCE after container creation
-  "postCreateCommand": "sudo mkdir -p ~/.cache && sudo chown -R $(whoami) ~/.cache && mkdir -p ~/.cache/zsh ~/.cache/zsh-utils && echo 'Dev container ready!'",
+  "postCreateCommand": ".devcontainer/post-create.sh",
 
   // Runs EVERY time container starts
-  "postStartCommand": "sudo chown -R vscode:vscode /commandhistory 2>/dev/null; touch /commandhistory/.zsh_history && ln -sf /commandhistory/.zsh_history ~/.zsh_history || true",
+  "postStartCommand": ".devcontainer/post-start.sh",
 
   "remoteUser": "vscode"
 }
