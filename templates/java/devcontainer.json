@@ -156,6 +156,10 @@
         "usernamehw.errorlens",
         "streetsidesoftware.code-spell-checker",
 
+        // Shell
+        "timonwong.shellcheck",
+        "jetmartin.bats",
+
         // Infrastructure
         "hashicorp.terraform",
         "redhat.vscode-yaml",
