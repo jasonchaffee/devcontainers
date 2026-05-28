@@ -1,6 +1,6 @@
 {
   "id": "linuxbrew",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "name": "Linuxbrew",
   "description": "Installs Homebrew on Linux under /home/linuxbrew/.linuxbrew.",
   "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/linuxbrew",

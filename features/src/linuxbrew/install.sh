@@ -53,12 +53,6 @@ else
     echo "Linuxbrew already installed at ${BREW_PREFIX}"
 fi
 
-if [ -d "${BREW_PREFIX}/Homebrew/Library" ]; then
-    if [ -L "${BREW_PREFIX}/Library" ] || [ ! -e "${BREW_PREFIX}/Library" ]; then
-        ln -sfn "${BREW_PREFIX}/Homebrew/Library" "${BREW_PREFIX}/Library"
-    fi
-fi
-
 if id "${TARGET_USER}" >/dev/null 2>&1; then
     usermod -aG linuxbrew "${TARGET_USER}" 2>/dev/null || true
 fi
