@@ -21,3 +21,14 @@ if [ -f /.dockerenv ] && [ -f "$HOME/.kube-host/config" ]; then
             --insecure-skip-tls-verify=true 2>/dev/null || true
     fi
 fi
+
+# Docker socket: fix group GID to match host so vscode user can use Docker
+# The docker-outside-of-docker feature bakes in a GID at image build time
+# which may differ from the host socket GID at runtime.
+if [ -S /var/run/docker.sock ]; then
+    _docker_gid=$(stat -c "%g" /var/run/docker.sock 2>/dev/null || stat -f "%g" /var/run/docker.sock 2>/dev/null || echo "")
+    if [ -n "$_docker_gid" ] && [ "$_docker_gid" != "0" ]; then
+        sudo groupmod -g "$_docker_gid" docker 2>/dev/null || true
+        sudo usermod -aG docker "$(whoami)" 2>/dev/null || true
+    fi
+fi
