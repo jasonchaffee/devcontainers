@@ -179,6 +179,7 @@
 
         // AI Tools
         "anthropic.claude-code",
+        "openai.chatgpt",
         "github.copilot",
         "google.geminicodeassist"
       ],
