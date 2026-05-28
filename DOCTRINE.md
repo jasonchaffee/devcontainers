@@ -6,8 +6,8 @@ format: prose
 
 # DOCTRINE — jasonchaffee/devcontainers
 
-Governing constitution for this repository. All decisions about images, features,
-versioning, and directory layout are governed here. When in doubt, read this first.
+Governing constitution for this repository. All decisions about features, templates,
+and conventions are governed here. When in doubt, read this first.
 
 ---
 
@@ -15,138 +15,114 @@ versioning, and directory layout are governed here. When in doubt, read this fir
 
 This repo publishes two things:
 
-1. **Pre-built images** — Docker images with common tooling baked in, consumed by
-   consumer repos' `devcontainer.json` files for fast, consistent startup
-2. **Devcontainer features** — Installable packages for tools that don't belong in
-   a baked image (rapid-cadence, user-space, or optional tooling)
+1. **Devcontainer features** — Installable packages for individual tools, published
+   to `ghcr.io/jasonchaffee/devcontainers` automatically via GitHub Actions
+2. **Templates** — Complete `devcontainer.json` configurations for specific use cases
+   (Java, Python, TypeScript/Node), meant to be copied into a project and customized
 
-The goal is that a developer opening any project gets a complete environment without
-waiting for feature installation after the initial `devcontainer build`.
-
----
-
-## Image Tier Hierarchy
-
-Images form a single-tier family, all extending `mcr.microsoft.com/devcontainers/base:ubuntu`.
-Built with `devcontainer build` so feature scripts remain the install source of truth.
-
-```
-mcr.microsoft.com/devcontainers/base:ubuntu  (upstream)
- └── core    Ubuntu + modern-cli + shell tooling + uv + gcloud + github-cli + docker
-      ├── java    core + Java (Temurin) + Maven/Gradle + kubectl + Helm + skaffold
-      ├── python  core + Python 3 (deadsnakes) + uv (upgraded)
-      └── node    core + Node.js 24 LTS + Bun
-```
-
-**Published to:** `ghcr.io/jasonchaffee/devcontainers/<name>:<version>`
-
-### When to use each image
-
-| Use case | Image |
-|---|---|
-| Java / Spring Boot development | `java` |
-| Python development / data / scripting | `python` |
-| TypeScript / JavaScript / AI tooling | `node` |
-| General development / data / cloud | `core` |
-
-### Adding a new workload image
-
-Justified only when:
-- An existing tier cannot serve the use case (different primary language/toolchain)
-- The use case applies to more than one project
-- The toolset is stable and not better expressed as a feature
+The architecture is **features + templates only**. There are no pre-built Docker images
+to build or maintain. GitHub Actions publishes features automatically on every push to
+`main` that touches `features/src/**`. Features are cached after the first
+`devcontainer build`, so subsequent container opens are fast.
 
 ---
 
-## Bake vs. Feature Policy
+## Templates
 
-Every tool must be assigned to one bucket. This decision is permanent until this file
-is updated.
+Templates live under `templates/<name>/` and provide a ready-to-use
+`devcontainer.json` for a specific development use case. Copy a template to your
+project's `.devcontainer/` folder and customize.
 
-### Bake into the image when ALL THREE are true
+### Available templates
 
-| Criterion | Question to ask |
+| Template | Use case |
 |---|---|
-| **Universality** | Is this tool used in every project that references this image tier? |
-| **Stability** | Does the tool's major version change quarterly or less? |
-| **System scope** | Does it install to `/usr/local/bin` or system paths — not user home? |
+| `java` | Java / Spring Boot development (Temurin, Maven/Gradle, kubectl, Helm) |
+| `python` | Python development, scripting, data work |
+| `node` | TypeScript, JavaScript, and AI application development |
 
-### Stay as a `devcontainer.json` feature when ANY ONE is true
+### Template content policy
 
-| Criterion | Examples |
-|---|---|
-| **Rapid cadence** — ships weekly or more; developer should always get latest | claude-code, codex, gemini-cli |
-| **User-space install** — installs to `~/.local/bin`, `~/.claude/bin`, `~/.antidote` | claude-code, antidote |
-| **Optional / repo-specific** — not universal across all consumers of this image | jmeter, locust, spring, jetbrains, k6 |
-| **Auth-gated** — requires interactive auth or post-install user action | Any tool needing browser login |
+Templates SHOULD include by default:
+- `common-utils` (vscode user, zsh, git, sudo)
+- `modern-cli` (bat, eza, fd, ripgrep, fzf, zoxide, delta, yq)
+- `shell-dev` (shellcheck, bats)
+- `terminal-extras` (tmux, btop, viddy, tldr)
+- `antidote` (zsh plugin manager)
+- `http-tools` (xh)
+- `github-cli`
+- `docker-outside-of-docker`
+- AI tools: `claude-code`, `codex`
+- The primary language runtime for that template (Java, Python, or Node.js)
+- `uv` (Python package manager, useful even in non-Python templates for tooling)
 
-### Canonical assignments
+Templates SHOULD list as optional (commented-out) features:
+- `gemini-cli` (optional AI tool)
+- `gcloud-cli` (optional cloud tooling)
+- `skaffold` (optional Kubernetes dev tool)
+- `spring`, `jmeter`, `locust`, `k6` (domain-specific optional tools)
+- `jetbrains` (IDE-specific)
 
-| Tool | Where it lives | Reason |
-|---|---|---|
-| modern-cli + shell-dev + terminal-extras + uv + gcloud + github-cli | Baked → `core` | Universal, stable, system-scope |
-| Java (Temurin) + Maven/Gradle + kubectl + Helm + skaffold | Baked → `java` | Universal to Java repos, stable |
-| Python 3 + uv | Baked → `python` | Universal to Python repos, stable |
-| Node.js 24 LTS + Bun | Baked → `node` | Universal to JS/TS repos, stable, system-scope |
-| claude-code | Feature in `devcontainer.json` | Weekly releases, user-space install |
-| codex | Feature in `devcontainer.json` | Weekly releases, npm global user-space |
-| gemini-cli | Feature in `devcontainer.json` | Rapid cadence, optional |
-| antidote | Feature in `devcontainer.json` | User-space (`~/.antidote`), `_REMOTE_USER` sensitive |
-| http-tools | Feature in `devcontainer.json` | Optional, repo-specific |
-| spring | Feature in `devcontainer.json` | Optional, Java-repo-specific |
-| jmeter, locust, k6 | Feature in `devcontainer.json` | Optional, load-testing specific |
-| jetbrains | Feature in `devcontainer.json` | Optional, IDE-specific |
-| skaffold | Feature — OR baked → `java` | Universal to Java/K8s repos |
-
----
-
-## Build Strategy
-
-All workload images **must** be built with `devcontainer build`, not raw `docker build`.
-Feature scripts are the single source of truth for install logic.
-
-Each image directory (`images/<name>/`) contains:
-
-```
-images/<name>/
-  devcontainer.json    # Feature recipe — input to devcontainer build
-  build.sh             # Wraps devcontainer build with version tagging and push
-  Dockerfile           # OCI labels only — no tool installation
-```
-
-The `Dockerfile` exists solely for OCI label injection via `ARG`/`LABEL`. It **must not**
-contain `RUN`, `COPY`, or `ADD` commands that install tools.
-
-Image recipes **must pin** all feature references and tool version options. No `latest`,
-`lts`, or major-only floating selectors in baked image recipes.
+Templates MUST include a complete `remoteEnv` block with AI provider tokens
+(see Environment Variables below).
 
 ---
 
 ## Features
 
-Features are published to `ghcr.io/jasonchaffee/devcontainers` automatically by the
-GitHub Actions workflow on every push to `main` that touches `features/src/**`.
+Features are published automatically to `ghcr.io/jasonchaffee/devcontainers` via
+GitHub Actions on every push to `main`.
 
-Feature scripts **should** support multiple package managers (apt, apk, yum/dnf) for
-portability across base images, unless the feature explicitly declares Ubuntu-only.
+Feature scripts SHOULD support multiple package managers (apt, apk, yum/dnf) for
+portability across base images, unless a feature explicitly declares itself Ubuntu-only.
+
+### Available features
+
+| Feature | Description |
+|---|---|
+| `antidote` | Fast Zsh plugin manager |
+| `bun` | Bun JavaScript runtime, bundler, package manager |
+| `claude-code` | Claude Code CLI |
+| `codex` | OpenAI Codex CLI |
+| `gemini-cli` | Google Gemini CLI |
+| `gcloud-cli` | Google Cloud CLI with components |
+| `http-tools` | xh (modern curl/httpie alternative) |
+| `jetbrains` | JetBrains IDE system dependencies |
+| `jmeter` | Apache JMeter load testing |
+| `locust` | Python load testing framework |
+| `modern-cli` | bat, eza, fd, ripgrep, zoxide, delta, fzf, yq |
+| `shell-dev` | shellcheck, bats |
+| `skaffold` | Skaffold for local Kubernetes development |
+| `spring` | Spring Boot VS Code/IntelliJ extensions |
+| `terminal-extras` | tmux, btop, viddy, ttyd, tldr |
+| `uv` | Fast Python package manager (Astral) |
 
 ---
 
-## Versioning
+## Environment Variables
 
-Each image is versioned independently with semver (`X.Y.Z`).
+All templates MUST use these `remoteEnv` keys. IDE env var forwarding requires
+a LaunchAgent on macOS for Dock/Spotlight-launched IDEs (see README.md).
 
-| Change type | Bump |
-|---|---|
-| Tool version updated within existing set | Patch (`Z+1`) |
-| Tool added to or removed from image | Minor (`Y+1`) |
-| Base image changed or breaking devcontainer interface | Major (`X+1`) |
+```json
+"remoteEnv": {
+  "ANTHROPIC_API_KEY":  "${localEnv:ANTHROPIC_API_KEY}",
+  "ANTHROPIC_BASE_URL": "${localEnv:ANTHROPIC_BASE_URL}",
+  "ANTHROPIC_AUTH_TOKEN": "${localEnv:ANTHROPIC_AUTH_TOKEN}",
+  "ANTHROPIC_MODEL":    "${localEnv:ANTHROPIC_MODEL}",
+  "DISABLE_AUTOUPDATER": "${localEnv:DISABLE_AUTOUPDATER}",
+  "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "${localEnv:CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS}",
+  "OPENAI_API_KEY":     "${localEnv:OPENAI_API_KEY}",
+  "OPENAI_BASE_URL":    "${localEnv:OPENAI_BASE_URL}",
+  "GEMINI_API_KEY":     "${localEnv:GEMINI_API_KEY}",
+  "GEMINI_BASE_URL":    "${localEnv:GEMINI_BASE_URL}",
+  "GOOGLE_CLOUD_PROJECT": "${localEnv:GOOGLE_CLOUD_PROJECT}",
+  "GITHUB_TOKEN":       "${localEnv:GITHUB_TOKEN}"
+}
+```
 
-Every release receives `:X.Y.Z`, `:X` (major floating), and `:latest` tags.
-Unlike DockerHub, GHCR allows tag overwrites — floating tags are updated in place.
-
-Exact version tag publication is required and must fail the release if it fails.
-Floating tag updates are best-effort.
+**Important:** Use `GEMINI_API_KEY` — not `GOOGLE_API_KEY`. The Gemini CLI uses
+`GEMINI_API_KEY`.
 
 ---
 
@@ -160,57 +136,29 @@ features/
   test/<name>/
     test.sh
 
-images/
-  core/
-  java/
-  python/
-  node/
-
 templates/
-  java/         # Reference devcontainer.json for Java / Spring Boot projects
-  python/       # Reference devcontainer.json for Python projects
-  node/         # Reference devcontainer.json for TypeScript / JavaScript projects
+  java/           # Java / Spring Boot
+  python/         # Python development
+  node/           # TypeScript / JavaScript / AI
 
 proposals/
-  <name>/       # Active proposals
-  archive/      # Shipped, abandoned, or superseded proposals
+  <name>/         # Active proposals
+  archive/        # Shipped, abandoned, or superseded
 
-DOCTRINE.md     # This file
+DOCTRINE.md       # This file
+README.md
 ```
-
----
-
-## Consumer devcontainer.json Shape
-
-A consumer repo referencing a published image should contain only:
-
-```json
-{
-  "image": "ghcr.io/jasonchaffee/devcontainers/java:1.0.0",
-  "mounts": [...],
-  "remoteEnv": {...},
-  "customizations": { "vscode": { "extensions": [...] } },
-  "features": {
-    "ghcr.io/jasonchaffee/devcontainers/claude-code:1": {},
-    "ghcr.io/jasonchaffee/devcontainers/codex:1": {},
-    "ghcr.io/jasonchaffee/devcontainers/antidote:1": {}
-  }
-}
-```
-
-The `features` block should contain **only** tools that satisfy the "stay as feature" criteria.
-Never re-declare a tool already baked into the referenced image.
 
 ---
 
 ## Governance
 
-Proposed changes to the image hierarchy, bake-vs-feature policy, or versioning rules
-go through the `proposals/` workflow:
+Proposed changes to template content policy, feature conventions, or tooling
+assignments go through the `proposals/` workflow:
 
 1. Create `proposals/<name>/proposal.md`
-2. Get approval (self-review for personal repo)
+2. Self-review and approve
 3. Implement
-4. Archive the proposal
+4. Archive with shipped status
 
 Active open proposal: `proposals/devcontainer-image-hierarchy/`

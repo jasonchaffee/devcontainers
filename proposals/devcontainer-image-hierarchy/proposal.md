@@ -1,5 +1,5 @@
 ---
-id: devcontainer-image-hierarchy
+id: devcontainer-template-expansion
 status: draft
 format: rfc2119+gherkin
 created: 2026-05-28
@@ -8,249 +8,218 @@ target-specs:
   - DOCTRINE.md
 ---
 
-# Proposal: DevContainer Image Hierarchy
+# Proposal: Template Expansion and Missing Features
 
 ## Problem
 
-This repo currently publishes only devcontainer features — no pre-built images. Every
-consumer `devcontainer.json` references `mcr.microsoft.com/devcontainers/base:ubuntu`
-directly and installs 10–15 features from scratch on every fresh devcontainer build.
+This repo publishes devcontainer features and one template (`java`). Three gaps
+limit its usefulness:
 
-This causes:
-1. Slow first-time startup — features install serially at devcontainer-build time
-2. Every project declares the same feature set, creating drift and maintenance overhead
-3. No documented policy for what belongs in a baked image vs. a feature, so both grow
-   arbitrarily over time
-4. Only one template (`java`) — no Python, Node.js/TypeScript, or AI templates exist
+1. **Missing templates** — there is no `python` or `node` template. Python
+   developers and TypeScript/JavaScript developers have no starting point.
+2. **Missing features** — `uv` (fast Python package manager), `bun` (JavaScript
+   runtime), and `skaffold` (local Kubernetes development) are not available as
+   features, though related repos already have working implementations.
+3. **Stale env var** — the `java` template passes `GOOGLE_API_KEY` to
+   `remoteEnv`; the correct name for Gemini CLI is `GEMINI_API_KEY`.
 
-The `jasonchaffee/devcontainers` repo on GitHub already publishes features to
-`ghcr.io/jasonchaffee/devcontainers`. The same registry can serve pre-built images,
-and `devcontainer build` can bake features into images at publishing time rather than at
-each developer's first container start.
+The current templates + features model is the right architecture for a personal
+repo: GitHub Actions auto-publishes features on every push to `main`, features are
+cached after the first `devcontainer build`, and projects can mix and match exactly
+what they need. No pre-built image pipeline is needed.
 
 ## Goals
 
-1. Publish pre-built images for Java, Python, and Node.js/TypeScript development so
-   first-time `devcontainer up` requires no feature installation for universal tools
-2. Reduce consumer `devcontainer.json` to: image reference + mounts + remoteEnv + IDE
-   config + rapid-cadence or optional features only
-3. Add `bun` as a baked tool in the `node` image and as a standalone feature
-4. Add `uv`, `bun`, and `skaffold` as publishable features (ported patterns)
-5. Establish a documented bake-vs-feature policy in `DOCTRINE.md`
-6. Add `python` and `node` templates alongside the existing `java` template
+1. Add `python` template for Python development projects
+2. Add `node` template for TypeScript, JavaScript, and AI development projects
+3. Add `uv` feature (Astral's fast Python package manager)
+4. Add `bun` feature (JavaScript runtime, bundler, package manager)
+5. Add `skaffold` feature (local Kubernetes development)
+6. Fix `GOOGLE_API_KEY` → `GEMINI_API_KEY` across all templates
+7. Establish a documented template content policy in `DOCTRINE.md`
 
 ## Non-Goals
 
-- Automated image rebuild CI/CD (follow-on — images start with a manual `./build.sh`)
-- `ai` workload image (deferred — the `node` image covers TypeScript AI development)
-- Multi-architecture builds (linux/amd64 initially; arm64 is a follow-on)
-- JetBrains Gateway image variants
+- Pre-built Docker images or an image hierarchy
+- Automated image CI/CD pipeline
+- Multi-architecture feature builds (arm64 support is best-effort)
 
 ## Proposed Solution
 
-Introduce a single-tier image family built with `devcontainer build`:
-
-```
-mcr.microsoft.com/devcontainers/base:ubuntu
- └── core    modern-cli + shell-dev + terminal-extras + uv + gcloud + github-cli + docker
-      ├── java    core + Java (Temurin 21/25) + Maven + kubectl + Helm + skaffold
-      ├── python  core + Python 3.14 (deadsnakes) + uv
-      └── node    core + Node.js 24 LTS + Bun
-```
-
-Consumer `devcontainer.json` references the appropriate image and adds only:
-- Rapid-cadence AI tools: claude-code, codex, gemini-cli
-- User-space shell tooling: antidote
-- Optional/repo-specific: jmeter, locust, spring, jetbrains, k6
+Add three features and two templates. Update the existing `java` template.
+All features follow existing conventions: multi-platform install scripts
+(apt/apk/yum), bats tests, `devcontainer-feature.json` metadata.
 
 ---
 
 ## Requirements
 
-### R-1 — Image family
+### R-1 — `uv` feature
 
-The repo MUST publish the following images to `ghcr.io/jasonchaffee/devcontainers/`:
+A `uv` feature MUST be added to `features/src/uv/` with:
+- Binary install to `/usr/local/bin/uv` from the Astral official installer
+- `version` option defaulting to `latest` (uv ships frequently; latest is appropriate)
+- bats test: `command -v uv` and `uv --version`
 
-| Image | Tag pattern | Inherits from | Primary consumers |
-|---|---|---|---|
-| `core` | `X.Y.Z` | `mcr.microsoft.com/devcontainers/base:ubuntu` | All consumer projects |
-| `java` | `X.Y.Z` | `core:X.Y.Z` | Java / Spring Boot projects |
-| `python` | `X.Y.Z` | `core:X.Y.Z` | Python projects |
-| `node` | `X.Y.Z` | `core:X.Y.Z` | TypeScript / JavaScript / AI projects |
+The `uv` feature MUST be referenced in the `python` template and SHOULD be
+referenced in the `java` template (Python tooling is often needed alongside Java).
 
-### R-2 — Core image contents
+### R-2 — `bun` feature
 
-The `core` image MUST include, baked via `devcontainer build`:
+A `bun` feature MUST be added to `features/src/bun/` with:
+- Binary download from GitHub releases (`oven-sh/bun`) to `/usr/local/bin/bun`
+- Architecture detection: amd64 and arm64
+- `version` option defaulting to `latest`
+- bats test: `command -v bun` and `bun --version`
 
-- common-utils (vscode user, zsh, sudo, git)
-- modern-cli: bat, eza, fd, ripgrep, fzf, zoxide, delta, yq
-- shell-dev: shellcheck, bats
-- terminal-extras: tmux, btop, viddy, tldr
-- uv (Python package manager)
-- Google Cloud CLI with gke-gcloud-auth-plugin
-- github-cli
-- docker-outside-of-docker
-- http-tools (xh)
+The `bun` feature MUST be referenced in the `node` template.
+It MAY be used standalone in any project that needs Bun without the full `node` template.
 
-The `core` image MUST NOT include Java, Python (beyond what gcloud needs), Node.js, Bun,
-or any workload-specific tool.
+### R-3 — `skaffold` feature
 
-### R-3 — Java image contents
+A `skaffold` feature MUST be added to `features/src/skaffold/` with:
+- Binary download from Google Cloud Storage
+  (`https://storage.googleapis.com/skaffold/releases/v{VERSION}/skaffold-linux-{amd64|arm64}`)
+- `version` option defaulting to `2.20.0`
+- bats test: `command -v skaffold` and `skaffold version`
 
-The `java` image MUST include everything in `core` plus:
+The `skaffold` feature MUST be referenced (commented out as optional) in the
+`java` template. It SHOULD NOT be in the default features block of any template.
 
-- Java (Temurin distribution, version option defaulting to 21)
-- Maven
-- kubectl (latest stable)
-- Helm (latest stable)
-- skaffold
+### R-4 — `python` template
 
-The `java` image SHOULD NOT include Python dev headers, Node.js, or Bun.
+A `python` template MUST be created at `templates/python/` with:
+- `devcontainer-template.json` (metadata, template options)
+- `devcontainer.json` using `mcr.microsoft.com/devcontainers/base:ubuntu`
+- Features: common-utils, python:1, github-cli, docker-outside-of-docker,
+  uv, antidote, modern-cli, shell-dev, terminal-extras, http-tools,
+  claude-code, codex
+- IDE extensions: ms-python.python, charliermarsh.ruff, and standard tooling
+- `remoteEnv` with corrected AI provider keys (see R-7)
+- `post-create.sh` and `post-start.sh` lifecycle scripts
+- Template options for Python version, claude-code version, gemini inclusion
 
-### R-4 — Python image contents
+### R-5 — `node` template
 
-The `python` image MUST include everything in `core` plus:
+A `node` template MUST be created at `templates/node/` with:
+- `devcontainer-template.json` (metadata, template options)
+- `devcontainer.json` using `mcr.microsoft.com/devcontainers/base:ubuntu`
+- Features: common-utils, node:1, github-cli, docker-outside-of-docker,
+  antidote, modern-cli, shell-dev, terminal-extras, http-tools, bun,
+  claude-code, codex
+- IDE extensions: TypeScript, ESLint, Prettier, and standard tooling
+- `remoteEnv` with corrected AI provider keys (see R-7)
+- `post-create.sh` and `post-start.sh` lifecycle scripts
+- Template options for Node version, Bun inclusion, claude-code version
 
-- Python 3.14 (via deadsnakes PPA, pinned exact apt package version)
-- uv (version upgrade over core's uv, ensuring current release)
+### R-6 — Update `java` template
 
-The `python` image SHOULD NOT include Java, Node.js, or Bun.
+The existing `java` template MUST be updated to:
+- Replace `GOOGLE_API_KEY` with `GEMINI_API_KEY` in `remoteEnv`
+- Add `ANTHROPIC_MODEL`, `OPENAI_API_KEY`, `OPENAI_BASE_URL` to `remoteEnv`
+- Reference `uv` feature (Python tooling useful alongside Java)
+- List `skaffold` as a commented-out optional feature
+- Align `post-create.sh` / `post-start.sh` with the `python` and `node` templates
 
-### R-5 — Node image contents
+### R-7 — Environment variable correctness
 
-The `node` image MUST include everything in `core` plus:
-
-- Node.js 24 LTS
-- Bun (latest stable, binary installed to `/usr/local/bin/bun`)
-
-The `node` image SHOULD NOT include Java or Python dev headers.
-
-### R-6 — New features
-
-The following features MUST be added to `features/src/`:
-
-| Feature | Description | Notes |
-|---|---|---|
-| `uv` | Fast Python package manager (Astral) | Port from PayPal repo |
-| `bun` | Bun JavaScript runtime, bundler, package manager | Port from PayPal repo |
-| `skaffold` | Skaffold for local Kubernetes development | Port from PayPal repo |
-
-Each new feature MUST have a corresponding `features/test/<name>/test.sh`.
-
-Bun MUST also be available as a standalone feature so projects not using the `node`
-image can install it selectively.
-
-### R-7 — Bake vs. feature policy
-
-The policy in `DOCTRINE.md §Bake vs. Feature Policy` MUST govern all tooling decisions.
-The canonical assignments table MUST be kept current as tools are added or reclassified.
-
-### R-8 — Build strategy
-
-All workload images MUST be built using `devcontainer build`, not raw `docker build`.
-
-Each image directory (`images/<name>/`) MUST contain:
-- `devcontainer.json` — pinned feature recipe (no floating selectors)
-- `build.sh` — wraps `devcontainer build`; supports `--push` and `--push-only` flags
-- `Dockerfile` — OCI labels only; MUST NOT contain `RUN`/`COPY`/`ADD` install logic
-
-### R-9 — Versioning
-
-Each image MUST be independently versioned with semver (`X.Y.Z`). GHCR allows tag
-overwrites; floating tags (`:major`, `:latest`) MUST be updated on each release.
-Exact version tag publication MUST fail the build if it fails.
-
-### R-10 — Templates
-
-The following templates MUST be created or updated:
-
-| Template | Action |
-|---|---|
-| `templates/java/` | Update: reference `java:1.0.0`, strip baked features |
-| `templates/python/` | Create: reference `python:1.0.0`, add python-specific IDE config |
-| `templates/node/` | Create: reference `node:1.0.0`, add TypeScript IDE config |
-
-### R-11 — DOCTRINE.md
-
-The `DOCTRINE.md` (already created) MUST remain the governing constitution for all future
-tooling decisions. It MUST be updated to remove `(to be created)` annotations after images
-are published.
-
-### R-12 — Environment variables
-
-Consumer `devcontainer.json` templates MUST forward AI provider tokens in `remoteEnv`.
-For non-PayPal environments, use direct API keys:
+All templates MUST use the following `remoteEnv` keys for AI providers:
 
 ```json
 "remoteEnv": {
   "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}",
   "ANTHROPIC_BASE_URL": "${localEnv:ANTHROPIC_BASE_URL}",
+  "ANTHROPIC_AUTH_TOKEN": "${localEnv:ANTHROPIC_AUTH_TOKEN}",
+  "ANTHROPIC_MODEL": "${localEnv:ANTHROPIC_MODEL}",
+  "DISABLE_AUTOUPDATER": "${localEnv:DISABLE_AUTOUPDATER}",
+  "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "${localEnv:CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS}",
   "OPENAI_API_KEY": "${localEnv:OPENAI_API_KEY}",
+  "OPENAI_BASE_URL": "${localEnv:OPENAI_BASE_URL}",
   "GEMINI_API_KEY": "${localEnv:GEMINI_API_KEY}",
+  "GEMINI_BASE_URL": "${localEnv:GEMINI_BASE_URL}",
   "GOOGLE_CLOUD_PROJECT": "${localEnv:GOOGLE_CLOUD_PROJECT}",
   "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
 }
 ```
 
-Note: `GEMINI_API_KEY` is the correct key name (not `GOOGLE_API_KEY`).
+Templates MUST NOT use `GOOGLE_API_KEY` — Gemini CLI uses `GEMINI_API_KEY`.
+
+### R-8 — Feature tests
+
+Every new feature MUST have a `features/test/<name>/test.sh` with bats checks that:
+- Verify the primary binary exists (`command -v <tool>`)
+- Verify the tool runs and returns a version (`<tool> --version`)
+- Run successfully against `mcr.microsoft.com/devcontainers/base:ubuntu`
+
+Features with install options MUST have a `scenarios.json` that tests at minimum:
+the default install and at least one non-default option (e.g., a specific version).
+
+### R-9 — Template tests
+
+Each template MUST have a `templates/<name>/test-project/` directory containing a
+minimal test project that can be opened with `devcontainer up` to verify the template
+builds without errors. This serves as the smoke test for the template.
+
+### R-10 — Documentation
+
+`README.md` MUST be updated to:
+- List all three templates (`java`, `python`, `node`) in the Templates section
+- List the three new features (`uv`, `bun`, `skaffold`) in the Features table
+- Remove or correct any reference to `GOOGLE_API_KEY`
+
+`DOCTRINE.md` MUST reflect that this repo uses templates + features (not pre-built
+images) and document the template content policy.
+
+Each new feature SHOULD have auto-generated documentation produced by the
+`devcontainers/action@v1` CI step (triggered automatically on push to `main`).
 
 ---
 
 ## Success Criteria
 
-- A developer who opens a Java project using the `java` image gets a complete environment
-  with no feature installation wait after the initial `devcontainer build`
-- A TypeScript/AI project using the `node` image has Node.js 24 and Bun available without
-  any `features` block entries for those tools
-- A Python project using the `python` image has Python 3.14 and uv available at startup
-- Consumer `devcontainer.json` contains only AI tools (claude-code, codex, gemini-cli),
-  antidote, and any optional/repo-specific features
+- A Python developer can copy `templates/python/` and open in a devcontainer
+  with Python, uv, and AI tools available without manual feature configuration
+- A TypeScript developer can copy `templates/node/` and open with Node.js, Bun,
+  and AI tools available
+- `bun`, `uv`, and `skaffold` are published to `ghcr.io/jasonchaffee/devcontainers`
+  and usable as standalone features in any `devcontainer.json`
+- No template passes `GOOGLE_API_KEY` — all use `GEMINI_API_KEY`
 
 ## Acceptance Criteria
 
 ```gherkin
-Feature: DevContainer image hierarchy
+Feature: Template expansion and missing features
 
-  Scenario: core image provides universal tooling
-    Given the core image has been built and published
-    When a developer starts a devcontainer referencing core
-    Then bat, rg, fd, fzf, jq, yq, gcloud, gh, docker, uv, and zsh SHALL be available
-    And java, python3, node, and bun SHALL NOT be present
+  Scenario: python template provides Python development environment
+    Given a developer copies templates/python/ to their project
+    When they open the project in a devcontainer
+    Then python3, pip, uv, gh, bat, rg, fzf, jq, and zsh SHALL be available
+    And the devcontainer SHALL open without errors
 
-  Scenario: java image provides Java toolchain
-    Given the java image has been built
-    When a developer opens a Java project in a devcontainer
-    Then java, mvn, kubectl, helm, and skaffold SHALL be available
-    And no feature installation for those tools SHALL run at startup
-
-  Scenario: python image provides Python toolchain
-    Given the python image has been built
-    When a developer opens a Python project in a devcontainer
-    Then python3 --version SHALL report 3.14.x and uv SHALL be available
-    And no feature installation for those tools SHALL run at startup
-
-  Scenario: node image provides JavaScript/TypeScript toolchain
-    Given the node image has been built
-    When a developer opens a TypeScript project in a devcontainer
-    Then node --version SHALL report v24.x and bun --version SHALL succeed
-    And /usr/local/bin/bun SHALL exist and be executable
-    And no feature installation for those tools SHALL run at startup
+  Scenario: node template provides JavaScript/TypeScript environment
+    Given a developer copies templates/node/ to their project
+    When they open the project in a devcontainer
+    Then node, npm, and bun SHALL be available at /usr/local/bin/
+    And the devcontainer SHALL open without errors
 
   Scenario: bun feature works standalone
-    Given the bun feature is published to ghcr.io/jasonchaffee/devcontainers/bun:1
-    When a devcontainer installs the bun feature without the node image
-    Then bun SHALL be available at /usr/local/bin/bun
+    Given a devcontainer.json installs ghcr.io/jasonchaffee/devcontainers/bun:1
+    When the devcontainer is built
+    Then /usr/local/bin/bun SHALL exist and bun --version SHALL succeed
 
-  Scenario: consumer devcontainer.json is minimal
-    Given the java image is referenced in a project devcontainer.json
-    When the features block is inspected
-    Then it SHALL contain only tools satisfying the stay-as-feature criteria in DOCTRINE.md
-    And it SHALL NOT declare java, maven, kubectl, helm, skaffold, or any baked tool
+  Scenario: uv feature works standalone
+    Given a devcontainer.json installs ghcr.io/jasonchaffee/devcontainers/uv:1
+    When the devcontainer is built
+    Then uv --version SHALL succeed
+
+  Scenario: skaffold feature works standalone
+    Given a devcontainer.json installs ghcr.io/jasonchaffee/devcontainers/skaffold:1
+    When the devcontainer is built
+    Then skaffold version SHALL succeed
+
+  Scenario: java template uses correct env var names
+    Given the java template devcontainer.json
+    When remoteEnv is inspected
+    Then GEMINI_API_KEY SHALL be present
+    And GOOGLE_API_KEY SHALL NOT be present
 ```
-
-## Out of Scope
-
-- Automated image CI/CD pipeline (manual `./build.sh` initially)
-- `ai` dedicated workload image — `node` covers TypeScript AI development
-- Multi-architecture (arm64) image builds
-- JetBrains IDE-specific image variants
