@@ -22,12 +22,15 @@ Files:
 - `devcontainer-feature.json`: id `uv`, version `1.0.0`, `version` option default `latest`
 - `install.sh`: `UV_INSTALL_DIR=/usr/local/bin`, `UV_NO_MODIFY_PATH=1`, Astral installer
 
-Create `features/test/uv/test.sh` (bash format):
+Create `features/test/uv/test.sh`:
 ```bash
 #!/bin/bash
 set -e
-command -v uv || { echo "[FAIL] uv not found"; exit 1; }
-echo "[OK] uv: $(uv --version)"
+# shellcheck source=/dev/null
+source dev-container-features-test-lib
+check "uv installed" command -v uv
+check "uv version runs" uv --version
+reportResults
 ```
 
 **Verify:** `bash -n features/src/uv/install.sh`
@@ -46,10 +49,12 @@ Create `features/test/bun/test.sh`:
 ```bash
 #!/bin/bash
 set -e
-command -v bun || { echo "[FAIL] bun not found"; exit 1; }
-echo "[OK] bun: $(bun --version)"
-test -x /usr/local/bin/bun || { echo "[FAIL] bun not at /usr/local/bin"; exit 1; }
-echo "[OK] bun is at /usr/local/bin/bun"
+# shellcheck source=/dev/null
+source dev-container-features-test-lib
+check "bun installed" command -v bun
+check "bun in /usr/local/bin" test -x /usr/local/bin/bun
+check "bun version runs" bun --version
+reportResults
 ```
 
 **Verify:** `bash -n features/src/bun/install.sh`
@@ -70,8 +75,11 @@ Create `features/test/skaffold/test.sh`:
 ```bash
 #!/bin/bash
 set -e
-command -v skaffold || { echo "[FAIL] skaffold not found"; exit 1; }
-echo "[OK] skaffold: $(skaffold version)"
+# shellcheck source=/dev/null
+source dev-container-features-test-lib
+check "skaffold installed" command -v skaffold
+check "skaffold version runs" skaffold version
+reportResults
 ```
 
 **Verify:** `bash -n features/src/skaffold/install.sh`
@@ -166,7 +174,7 @@ to templates table) and run `/spec:archive --shipped` to close the proposal.
 
 - Skaffold default: `latest` (not pinned) — this is a feature not an image, developers
   can pin in their own devcontainer.json if needed
-- Test format: bash `[OK]`/`[FAIL]` to match existing repo convention (not bats)
+- Test format: bats (`dev-container-features-test-lib`) — all existing tests converted
 - Python template: uses official `python:1` feature (multi-platform, not Ubuntu-only)
 - Node template: includes bun by default — it's the primary reason to use this template
 - No test-project smoke-test directories in this phase (follow-on)

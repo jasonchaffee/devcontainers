@@ -79,10 +79,15 @@ Port directly from `Dev/OnePayPal/devcontainers/features/src/uv/`.
 - `UV_INSTALL_DIR=/usr/local/bin`, `UV_NO_MODIFY_PATH=1`
 - Astral official installer handles all platforms
 
-**test/uv/test.sh** — bash format matching repo convention:
+**test/uv/test.sh**:
 ```bash
-command -v uv || { echo "[FAIL] uv not found"; exit 1; }
-echo "[OK] uv: $(uv --version)"
+#!/bin/bash
+set -e
+# shellcheck source=/dev/null
+source dev-container-features-test-lib
+check "uv installed" command -v uv
+check "uv version runs" uv --version
+reportResults
 ```
 
 ---
@@ -115,10 +120,14 @@ Port from `Dev/OnePayPal/devcontainers/features/src/bun/`.
 
 **test/bun/test.sh**:
 ```bash
-command -v bun || { echo "[FAIL] bun not found"; exit 1; }
-echo "[OK] bun: $(bun --version)"
-test -x /usr/local/bin/bun || { echo "[FAIL] bun not executable at /usr/local/bin"; exit 1; }
-echo "[OK] bun is at /usr/local/bin/bun"
+#!/bin/bash
+set -e
+# shellcheck source=/dev/null
+source dev-container-features-test-lib
+check "bun installed" command -v bun
+check "bun in /usr/local/bin" test -x /usr/local/bin/bun
+check "bun version runs" bun --version
+reportResults
 ```
 
 ---
@@ -153,8 +162,13 @@ this feature is not baked into an image. Consumers who want pinned versions spec
 
 **test/skaffold/test.sh**:
 ```bash
-command -v skaffold || { echo "[FAIL] skaffold not found"; exit 1; }
-echo "[OK] skaffold: $(skaffold version)"
+#!/bin/bash
+set -e
+# shellcheck source=/dev/null
+source dev-container-features-test-lib
+check "skaffold installed" command -v skaffold
+check "skaffold version runs" skaffold version
+reportResults
 ```
 
 ---
@@ -264,14 +278,6 @@ Changes only (no structural rewrites):
    ```json
    // "ghcr.io/jasonchaffee/devcontainers/skaffold:1": {}
    ```
-
----
-
-## Test Format Note
-
-The repo uses a bash `[OK]`/`[FAIL]` test format, not bats. The proposal mentions
-"bats checks" but the existing tests (antidote, gcloud-cli, etc.) use this bash format.
-All new tests follow the bash format for consistency. Bats migration is a separate concern.
 
 ---
 
