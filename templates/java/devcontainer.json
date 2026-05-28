@@ -273,7 +273,7 @@
     // Git (needed for commits and push/pull)
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
     "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached,readonly",
 
     // Maven cache (speeds up builds significantly)
     "source=${localEnv:HOME}/.m2,target=/home/vscode/.m2,type=bind,consistency=cached",
@@ -287,12 +287,14 @@
     // =========================================================================
 
     // AI Tools - remove lines for tools you don't use
-    "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.codex,target=/home/vscode/.codex,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.gemini,target=/home/vscode/.gemini,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached,readonly",
+    "source=${localEnv:HOME}/.claude.json,target=/tmp/claude-host.json,type=bind,consistency=cached,readonly",
+    "source=${localEnv:HOME}/.codex,target=/home/vscode/.codex,type=bind,consistency=cached,readonly",
+    "source=${localEnv:HOME}/.mcp-auth,target=/home/vscode/.mcp-auth,type=bind,consistency=cached,readonly",
+    "source=${localEnv:HOME}/.antigravity,target=/home/vscode/.antigravity,type=bind,consistency=cached,readonly",
+    "source=${localEnv:HOME}/.gemini,target=/home/vscode/.gemini,type=bind,consistency=cached,readonly",
 
-    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached,readonly",
 
     // Cloud credentials
     "source=${localEnv:HOME}/.config/gcloud,target=/home/vscode/.config/gcloud,type=bind,consistency=cached",
@@ -309,7 +311,7 @@
     // =========================================================================
 
     // Cursor IDE settings
-    "source=${localEnv:HOME}/.cursor,target=/home/vscode/.cursor,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.cursor,target=/home/vscode/.cursor,type=bind,consistency=cached,readonly",
 
     // Zsh configuration - uncomment what you have
     "source=${localEnv:HOME}/.zshrc,target=/home/vscode/.zshrc,type=bind,consistency=cached",
@@ -327,7 +329,7 @@
   // Lifecycle Commands
   // --------------------------------------------------------------------------
   // Runs on host BEFORE container starts - create directories to avoid root ownership issues
-  "initializeCommand": "mkdir -p ~/.m2 ~/.kube ~/.claude ~/.codex ~/.gemini ~/.config/gcloud ~/.config/gh ~/.gradle",
+  "initializeCommand": "mkdir -p ~/.gemini ~/.mcp-auth ~/.antigravity ~/.m2 ~/.kube ~/.claude ~/.codex ~/.gemini ~/.config/gcloud ~/.config/gh ~/.gradle",
 
   // Runs ONCE after container creation
   "postCreateCommand": ".devcontainer/post-create.sh",
