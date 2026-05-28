@@ -1,28 +1,9 @@
 #!/bin/bash
 set -e
 
-echo "Testing Spring Boot feature..."
+# shellcheck source=/dev/null
+source dev-container-features-test-lib
 
-# Check if Java is available (Spring depends on Java)
-echo "Checking Java dependency..."
-if command -v java &> /dev/null; then
-    echo "[OK] Java is available: $(java --version 2>&1 | head -1)"
-else
-    echo "[FAIL] Java not found (Spring feature depends on Java)"
-    exit 1
-fi
+check "java installed" command -v java
 
-# Check Spring CLI if it was installed
-echo ""
-echo "Checking Spring CLI (optional)..."
-if command -v spring &> /dev/null; then
-    echo "[OK] Spring CLI is available"
-else
-    echo "[SKIP] Spring CLI not installed (optional - set installSpringCli: true to enable)"
-fi
-
-echo ""
-echo "Spring Boot feature test passed!"
-echo ""
-echo "Note: IDE extensions (Spring Boot Tools, Spring Initializr, etc.)"
-echo "will be installed when the IDE loads the devcontainer."
+reportResults

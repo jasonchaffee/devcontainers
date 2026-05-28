@@ -1,33 +1,11 @@
 #!/bin/bash
 set -e
 
-echo "Testing JetBrains IDE Support..."
+# shellcheck source=/dev/null
+source dev-container-features-test-lib
 
-# JetBrains feature installs system dependencies
-# Check for common required packages
+check "libxrender available" bash -c "ldconfig -p 2>/dev/null | grep -q libXrender || test -f /usr/lib/x86_64-linux-gnu/libXrender.so.1"
+check "libxtst available" bash -c "ldconfig -p 2>/dev/null | grep -q libXtst || test -f /usr/lib/x86_64-linux-gnu/libXtst.so.6"
+check "libxi available" bash -c "ldconfig -p 2>/dev/null | grep -q libXi || test -f /usr/lib/x86_64-linux-gnu/libXi.so.6"
 
-echo "Checking libxrender..."
-if ldconfig -p 2>/dev/null | grep -q libXrender || [ -f /usr/lib/libXrender.so.1 ] || [ -f /usr/lib64/libXrender.so.1 ]; then
-    echo "[OK] libXrender available"
-else
-    echo "[SKIP] libXrender not found (may not be required on this platform)"
-fi
-
-echo ""
-echo "Checking libxtst..."
-if ldconfig -p 2>/dev/null | grep -q libXtst || [ -f /usr/lib/libXtst.so.6 ] || [ -f /usr/lib64/libXtst.so.6 ]; then
-    echo "[OK] libXtst available"
-else
-    echo "[SKIP] libXtst not found (may not be required on this platform)"
-fi
-
-echo ""
-echo "Checking libxi..."
-if ldconfig -p 2>/dev/null | grep -q libXi || [ -f /usr/lib/libXi.so.6 ] || [ -f /usr/lib64/libXi.so.6 ]; then
-    echo "[OK] libXi available"
-else
-    echo "[SKIP] libXi not found (may not be required on this platform)"
-fi
-
-echo ""
-echo "JetBrains IDE Support test passed!"
+reportResults
