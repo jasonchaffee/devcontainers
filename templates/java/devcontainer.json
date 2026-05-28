@@ -316,7 +316,6 @@
     // "source=${localEnv:HOME}/.zshenv,target=/home/vscode/.zshenv,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.zprofile,target=/home/vscode/.zprofile,type=bind,consistency=cached",
     // "source=${localEnv:HOME}/.zsh,target=/home/vscode/.zsh,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.cache/antidote,target=/home/vscode/.cache/antidote,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.zsh_plugins.txt,target=/home/vscode/.zsh_plugins.txt,type=bind,consistency=cached",
 
     // Vim configuration
@@ -328,7 +327,7 @@
   // Lifecycle Commands
   // --------------------------------------------------------------------------
   // Runs on host BEFORE container starts - create directories to avoid root ownership issues
-  "initializeCommand": "mkdir -p ~/.cache/antidote ~/.m2 ~/.kube ~/.claude ~/.codex ~/.gemini ~/.config/gcloud ~/.config/gh ~/.gradle",
+  "initializeCommand": "mkdir -p ~/.m2 ~/.kube ~/.claude ~/.codex ~/.gemini ~/.config/gcloud ~/.config/gh ~/.gradle",
 
   // Runs ONCE after container creation
   "postCreateCommand": ".devcontainer/post-create.sh",

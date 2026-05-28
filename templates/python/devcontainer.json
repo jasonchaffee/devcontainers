@@ -147,7 +147,6 @@
     "source=${localEnv:HOME}/.cursor,target=/home/vscode/.cursor,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.zshrc,target=/home/vscode/.zshrc,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.zprofile,target=/home/vscode/.zprofile,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.cache/antidote,target=/home/vscode/.cache/antidote,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.zsh_plugins.txt,target=/home/vscode/.zsh_plugins.txt,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.vimrc,target=/home/vscode/.vimrc,type=bind,consistency=cached"
   ],
@@ -155,7 +154,7 @@
   // --------------------------------------------------------------------------
   // Lifecycle Commands
   // --------------------------------------------------------------------------
-  "initializeCommand": "mkdir -p ~/.cache/antidote ~/.claude ~/.codex ~/.gemini ~/.config/gh",
+  "initializeCommand": "mkdir -p ~/.claude ~/.codex ~/.gemini ~/.config/gh",
   "postCreateCommand": ".devcontainer/post-create.sh",
   "postStartCommand": ".devcontainer/post-start.sh",
 
