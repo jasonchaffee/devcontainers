@@ -58,3 +58,14 @@ with open(os.path.expanduser('~/.claude.json'), 'w') as f:
 print(f'Claude MCP URLs: 127.0.0.1 -> {host}')
 " "$_host_alias"
 fi
+
+# Initialize antidote plugin cache
+# Force regeneration so the cache is populated in this container.
+# (The compiled ~/.zsh_plugins.zsh may reference a cache that does not
+# exist in a fresh container; antidote bundle clones all plugins.)
+if command -v antidote >/dev/null 2>&1 && [ -f "$HOME/.zsh_plugins.txt" ]; then
+    echo "Initializing antidote plugin cache..."
+    zsh -c "source \$(antidote home)/antidote.zsh && antidote bundle < $HOME/.zsh_plugins.txt > $HOME/.zsh_plugins.zsh" 2>/dev/null || \
+    antidote bundle < "$HOME/.zsh_plugins.txt" > "$HOME/.zsh_plugins.zsh" 2>/dev/null || \
+    echo "Warning: antidote bundle failed (non-fatal — plugins may be missing)"
+fi
