@@ -160,5 +160,3 @@ assignments go through the `proposals/` workflow:
 2. Self-review and approve
 3. Implement
 4. Archive with shipped status
-
-Active open proposal: `proposals/template-expansion/`
