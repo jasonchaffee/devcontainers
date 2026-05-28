@@ -7,6 +7,11 @@ echo "Setting up devcontainer..."
 # Git safe.directory — workspace is owned by a different UID than vscode
 sudo git config --system --add safe.directory '*'
 
+# Force antidote to regenerate the compiled plugins file on first shell open.
+# The baked image may contain a stale ~/.zsh_plugins.zsh that references
+# a plugin cache that does not exist in this container.
+rm -f "$HOME/.zsh_plugins.zsh"
+
 # Cache directories
 sudo mkdir -p ~/.cache
 sudo chown -R "$(whoami)" ~/.cache
