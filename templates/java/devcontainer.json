@@ -287,12 +287,12 @@
     // =========================================================================
 
     // AI Tools - remove lines for tools you don't use
-    "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached,readonly",
+    "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude.json,target=/tmp/claude-host.json,type=bind,consistency=cached,readonly",
-    "source=${localEnv:HOME}/.codex,target=/home/vscode/.codex,type=bind,consistency=cached,readonly",
-    "source=${localEnv:HOME}/.mcp-auth,target=/home/vscode/.mcp-auth,type=bind,consistency=cached,readonly",
-    "source=${localEnv:HOME}/.antigravity,target=/home/vscode/.antigravity,type=bind,consistency=cached,readonly",
-    "source=${localEnv:HOME}/.gemini,target=/home/vscode/.gemini,type=bind,consistency=cached,readonly",
+    "source=${localEnv:HOME}/.codex,target=/home/vscode/.codex,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.mcp-auth,target=/home/vscode/.mcp-auth,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.antigravity,target=/home/vscode/.antigravity,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.gemini,target=/home/vscode/.gemini,type=bind,consistency=cached",
 
     "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached,readonly",
 
@@ -311,7 +311,7 @@
     // =========================================================================
 
     // Cursor IDE settings
-    "source=${localEnv:HOME}/.cursor,target=/home/vscode/.cursor,type=bind,consistency=cached,readonly",
+    "source=${localEnv:HOME}/.cursor,target=/home/vscode/.cursor,type=bind,consistency=cached",
 
     // Zsh configuration - uncomment what you have
     "source=${localEnv:HOME}/.zshrc,target=/home/vscode/.zshrc,type=bind,consistency=cached",
