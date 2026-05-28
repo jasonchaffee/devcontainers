@@ -163,6 +163,50 @@ _patch_mcp_toml() {
         echo "Warning: could not patch $file"
 }
 
+_dedupe_toml_tables() {
+    local file="$1" prefix="$2"
+    [ -f "$file" ] || return 0
+    python3 - "$file" "$prefix" <<'PY' 2>/dev/null || true
+import re
+import sys
+
+path, prefix = sys.argv[1], sys.argv[2]
+with open(path) as f:
+    lines = f.readlines()
+
+blocks = []
+current_header = None
+current = []
+header_re = re.compile(r'^\[([^\]]+)\]\s*$')
+
+for line in lines:
+    match = header_re.match(line)
+    if match:
+        if current:
+            blocks.append((current_header, current))
+        current_header = match.group(1)
+        current = [line]
+    else:
+        current.append(line)
+if current:
+    blocks.append((current_header, current))
+
+keep = []
+seen = set()
+for header, block in reversed(blocks):
+    if header and header.startswith(prefix):
+        if header in seen:
+            continue
+        seen.add(header)
+    keep.append((header, block))
+keep.reverse()
+
+with open(path, "w") as f:
+    for _, block in keep:
+        f.writelines(block)
+PY
+}
+
 _HOST=$(_detect_host_internal)
 
 _rewrite_config_file() {
@@ -203,3 +247,4 @@ _patch_mcp_json "$HOME/.openclaude/settings.json"           "$HOME/.openclaude/s
 _patch_mcp_json "$HOME/.config/opencode/opencode.json"      "$HOME/.config/opencode/opencode.json"      "$_HOST"
 _patch_mcp_json "$HOME/.junie/config.json"                  "$HOME/.junie/config.json"                  "$_HOST"
 _patch_mcp_toml "$HOME/.codex/config.toml"                  "$_HOST"
+_dedupe_toml_tables "$HOME/.codex/config.toml"              "hooks.state."

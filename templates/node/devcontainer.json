@@ -39,7 +39,7 @@
     // Custom Features
     // =========================================================================
     "ghcr.io/jasonchaffee/devcontainers/bun:1": {},
-    "ghcr.io/jasonchaffee/devcontainers/linuxbrew:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/linuxbrew:1.0.1": {},
     "ghcr.io/jasonchaffee/devcontainers/antidote:1": {},
     "ghcr.io/jasonchaffee/devcontainers/modern-cli:1": {},
     "ghcr.io/jasonchaffee/devcontainers/shell-dev:1": {},
