@@ -25,3 +25,4 @@ java --version 2>/dev/null | head -1
 
 echo ""
 echo "Dev container ready!"
+

@@ -19,3 +19,4 @@ uv --version 2>/dev/null || true
 
 echo ""
 echo "Dev container ready!"
+
