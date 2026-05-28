@@ -1,0 +1,25 @@
+{
+  "id": "node",
+  "version": "1.0.0",
+  "name": "Node.js",
+  "description": "Development container for TypeScript/JavaScript with Node.js, Bun, and AI coding assistants.",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/templates/node",
+  "options": {
+    "nodeVersion": {
+      "type": "string",
+      "enum": ["lts", "24", "22", "20"],
+      "default": "lts",
+      "description": "Node.js version to install"
+    },
+    "claudeCodeVersion": {
+      "type": "string",
+      "default": "latest",
+      "description": "Claude Code CLI version (e.g., '2.1.20' or 'latest')"
+    },
+    "installGemini": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install Google Gemini CLI"
+    }
+  }
+}

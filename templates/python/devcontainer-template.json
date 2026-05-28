@@ -1,0 +1,25 @@
+{
+  "id": "python",
+  "version": "1.0.0",
+  "name": "Python",
+  "description": "Development container for Python with uv, modern CLI tools, and AI coding assistants.",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/templates/python",
+  "options": {
+    "pythonVersion": {
+      "type": "string",
+      "enum": ["3", "3.13", "3.12", "3.11"],
+      "default": "3",
+      "description": "Python version to install"
+    },
+    "claudeCodeVersion": {
+      "type": "string",
+      "default": "latest",
+      "description": "Claude Code CLI version (e.g., '2.1.20' or 'latest')"
+    },
+    "installGemini": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install Google Gemini CLI"
+    }
+  }
+}

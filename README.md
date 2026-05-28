@@ -53,32 +53,42 @@ Each feature in `features/` can be used independently in any devcontainer.json:
 
 | Feature | Description |
 |---------|-------------|
-| `spring` | Spring Boot tools (VS Code/IntelliJ extensions, optional Spring CLI) |
 | `antidote` | Fast Zsh plugin manager |
+| `bun` | Bun JavaScript runtime, bundler, test runner, and package manager |
 | `claude-code` | Claude Code CLI with optional status line |
 | `codex` | OpenAI Codex CLI |
-| `gemini-cli` | Google Gemini CLI |
 | `gcloud-cli` | Google Cloud CLI with components |
-| `modern-cli` | bat, eza, fd, ripgrep, zoxide, delta, fzf, yq |
-| `shell-dev` | shellcheck, tldr |
+| `gemini-cli` | Google Gemini CLI |
 | `http-tools` | xh (modern curl/httpie) |
-| `terminal-extras` | tmux, btop, viddy, ttyd |
 | `jetbrains` | JetBrains IDE dependencies |
 | `jmeter` | Apache JMeter for load testing and performance measurement |
+| `locust` | Python load testing framework |
+| `modern-cli` | bat, eza, fd, ripgrep, zoxide, delta, fzf, yq |
+| `shell-dev` | shellcheck, tldr |
+| `skaffold` | Skaffold for local Kubernetes development |
+| `spring` | Spring Boot tools (VS Code/IntelliJ extensions, optional Spring CLI) |
+| `terminal-extras` | tmux, btop, viddy, ttyd |
+| `uv` | Fast Python package and project manager (Astral) |
 
 ## Templates
 
 Templates provide complete devcontainer configurations for specific use cases.
+Copy a template to your project's `.devcontainer/` folder and open in VS Code/Cursor.
 
 ### java
 
-Full-featured Java development environment with:
-- Java 21 (Temurin)
-- Maven/Gradle support
-- Modern CLI tools
-- AI coding assistants (Claude, Copilot, Gemini)
-- Cloud tooling (gcloud, kubectl, terraform)
-- VS Code extensions for Java development
+Full-featured Java development environment with Java (Temurin/Zulu), Maven/Gradle,
+modern CLI tools, AI coding assistants (Claude, Copilot, Gemini), and uv.
+
+### python
+
+Python development environment with Python 3, uv, modern CLI tools,
+and AI coding assistants (Claude, Copilot, Gemini).
+
+### node
+
+TypeScript/JavaScript development environment with Node.js LTS, Bun, modern CLI tools,
+and AI coding assistants (Claude, Copilot, Gemini).
 
 ## Development
 

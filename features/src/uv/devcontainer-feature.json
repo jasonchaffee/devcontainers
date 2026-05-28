@@ -1,0 +1,14 @@
+{
+  "id": "uv",
+  "version": "1.0.0",
+  "name": "uv",
+  "description": "Installs uv — an extremely fast Python package and project manager by Astral.",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/uv",
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "uv version to install (e.g. '0.4.0' or 'latest')"
+    }
+  }
+}

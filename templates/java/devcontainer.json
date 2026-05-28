@@ -61,6 +61,7 @@
     // =========================================================================
     // Custom Features
     // =========================================================================
+    "ghcr.io/jasonchaffee/devcontainers/uv:1": {},
     "ghcr.io/jasonchaffee/devcontainers/antidote:1": {},
     "ghcr.io/jasonchaffee/devcontainers/modern-cli:1": {},
     "ghcr.io/jasonchaffee/devcontainers/shell-dev:1": {},
@@ -110,6 +111,11 @@
     // Optional: JMeter (installJmeter: false)
     // =========================================================================
     // "ghcr.io/jasonchaffee/devcontainers/jmeter:1": {}
+
+    // =========================================================================
+    // Optional: Skaffold for local Kubernetes development
+    // =========================================================================
+    // "ghcr.io/jasonchaffee/devcontainers/skaffold:1": {},
 
     // =========================================================================
     // Optional: Terraform (installTerraform: false)
@@ -214,22 +220,18 @@
   // IDEs launched from Dock/Spotlight won't have shell env vars.
   // Set tokens in ~/.zshenv or use launchctl setenv for reliable forwarding.
   "remoteEnv": {
-    // =========================================================================
-    // AI Tools
-    // =========================================================================
-    // Claude Code
+    "ANTHROPIC_API_KEY":  "${localEnv:ANTHROPIC_API_KEY}",
     "ANTHROPIC_BASE_URL": "${localEnv:ANTHROPIC_BASE_URL}",
     "ANTHROPIC_AUTH_TOKEN": "${localEnv:ANTHROPIC_AUTH_TOKEN}",
-    "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}",
+    "ANTHROPIC_MODEL":    "${localEnv:ANTHROPIC_MODEL}",
     "DISABLE_AUTOUPDATER": "${localEnv:DISABLE_AUTOUPDATER}",
     "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "${localEnv:CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS}",
-
-    // Gemini CLI
-    "GOOGLE_API_KEY": "${localEnv:GOOGLE_API_KEY}",
+    "OPENAI_API_KEY":     "${localEnv:OPENAI_API_KEY}",
+    "OPENAI_BASE_URL":    "${localEnv:OPENAI_BASE_URL}",
+    "GEMINI_API_KEY":     "${localEnv:GEMINI_API_KEY}",
+    "GEMINI_BASE_URL":    "${localEnv:GEMINI_BASE_URL}",
     "GOOGLE_CLOUD_PROJECT": "${localEnv:GOOGLE_CLOUD_PROJECT}",
-
-    // GitHub token for gh CLI and Copilot
-    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
+    "GITHUB_TOKEN":       "${localEnv:GITHUB_TOKEN}"
   },
 
   // --------------------------------------------------------------------------

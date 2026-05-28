@@ -1,0 +1,14 @@
+{
+  "id": "bun",
+  "version": "1.0.0",
+  "name": "Bun",
+  "description": "Installs Bun — a fast JavaScript runtime, bundler, test runner, and package manager.",
+  "documentationURL": "https://github.com/jasonchaffee/devcontainers/tree/main/features/bun",
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Bun version to install (e.g. '1.2.0' or 'latest')"
+    }
+  }
+}

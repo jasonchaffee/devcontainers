@@ -1,0 +1,165 @@
+{
+  // ==========================================================================
+  // Node.js Dev Container Template
+  // ==========================================================================
+  // For TypeScript, JavaScript, and AI application development.
+  // Copy to your project's .devcontainer/devcontainer.json and customize.
+  // See: https://containers.dev/implementors/json_reference/
+  // ==========================================================================
+
+  "name": "Node.js Development",
+
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb",
+    "storage": "32gb"
+  },
+
+  // --------------------------------------------------------------------------
+  // Features
+  // --------------------------------------------------------------------------
+  "features": {
+    // =========================================================================
+    // Official Features
+    // =========================================================================
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "vscode",
+      "installZsh": true,
+      "configureZshAsDefaultShell": true
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "${templateOption:nodeVersion}"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+
+    // =========================================================================
+    // Custom Features
+    // =========================================================================
+    "ghcr.io/jasonchaffee/devcontainers/bun:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/antidote:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/modern-cli:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/shell-dev:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/http-tools:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/terminal-extras:1": {},
+
+    // AI Tools
+    "ghcr.io/jasonchaffee/devcontainers/claude-code:1": {
+      "version": "${templateOption:claudeCodeVersion}",
+      "installStatusLine": false
+    },
+    "ghcr.io/jasonchaffee/devcontainers/codex:1": {
+      "version": "latest"
+    }
+
+    // =========================================================================
+    // Optional — uncomment as needed
+    // =========================================================================
+    // "ghcr.io/jasonchaffee/devcontainers/gemini-cli:1": { "version": "latest" },
+    // "ghcr.io/jasonchaffee/devcontainers/gcloud-cli:1": { "version": "latest" },
+    // "ghcr.io/grafana/devcontainer-features/k6:1": {}
+  },
+
+  // --------------------------------------------------------------------------
+  // IDE Customizations
+  // --------------------------------------------------------------------------
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // TypeScript / JavaScript
+        "ms-vscode.vscode-typescript-next",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+
+        // Git
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        "donjayamanne.githistory",
+        "github.vscode-pull-request-github",
+
+        // Code quality
+        "usernamehw.errorlens",
+        "streetsidesoftware.code-spell-checker",
+
+        // Shell
+        "timonwong.shellcheck",
+        "jetmartin.bats",
+
+        // Utilities
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker",
+        "gruntfuggly.todo-tree",
+        "github.vscode-github-actions",
+
+        // AI Tools
+        "anthropic.claude-code",
+        "github.copilot",
+        "google.geminicodeassist"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "remote.autoForwardPorts": false
+      }
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // Environment Variables
+  // --------------------------------------------------------------------------
+  "remoteEnv": {
+    "ANTHROPIC_API_KEY":  "${localEnv:ANTHROPIC_API_KEY}",
+    "ANTHROPIC_BASE_URL": "${localEnv:ANTHROPIC_BASE_URL}",
+    "ANTHROPIC_AUTH_TOKEN": "${localEnv:ANTHROPIC_AUTH_TOKEN}",
+    "ANTHROPIC_MODEL":    "${localEnv:ANTHROPIC_MODEL}",
+    "DISABLE_AUTOUPDATER": "${localEnv:DISABLE_AUTOUPDATER}",
+    "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "${localEnv:CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS}",
+    "OPENAI_API_KEY":     "${localEnv:OPENAI_API_KEY}",
+    "OPENAI_BASE_URL":    "${localEnv:OPENAI_BASE_URL}",
+    "GEMINI_API_KEY":     "${localEnv:GEMINI_API_KEY}",
+    "GEMINI_BASE_URL":    "${localEnv:GEMINI_BASE_URL}",
+    "GOOGLE_CLOUD_PROJECT": "${localEnv:GOOGLE_CLOUD_PROJECT}",
+    "GITHUB_TOKEN":       "${localEnv:GITHUB_TOKEN}"
+  },
+
+  // --------------------------------------------------------------------------
+  // Port Forwarding
+  // --------------------------------------------------------------------------
+  "forwardPorts": [3000, 8080],
+  "portsAttributes": {
+    "3000": { "label": "Dev server", "onAutoForward": "notify" },
+    "8080": { "label": "App",        "onAutoForward": "notify" }
+  },
+
+  // --------------------------------------------------------------------------
+  // Mounts
+  // --------------------------------------------------------------------------
+  "mounts": [
+    "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+    "source=${localWorkspaceFolderBasename}-shellhistory,target=/commandhistory,type=volume",
+    "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.codex,target=/home/vscode/.codex,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.gemini,target=/home/vscode/.gemini,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.cursor,target=/home/vscode/.cursor,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.zshrc,target=/home/vscode/.zshrc,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.zprofile,target=/home/vscode/.zprofile,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.zsh_plugins.txt,target=/home/vscode/.zsh_plugins.txt,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.vimrc,target=/home/vscode/.vimrc,type=bind,consistency=cached"
+  ],
+
+  // --------------------------------------------------------------------------
+  // Lifecycle Commands
+  // --------------------------------------------------------------------------
+  "initializeCommand": "mkdir -p ~/.claude ~/.codex ~/.gemini ~/.config/gh",
+  "postCreateCommand": ".devcontainer/post-create.sh",
+  "postStartCommand": ".devcontainer/post-start.sh",
+
+  "remoteUser": "vscode"
+}
