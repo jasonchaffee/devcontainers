@@ -12,6 +12,97 @@ sudo mkdir -p ~/.cache
 sudo chown -R "$(whoami)" ~/.cache
 mkdir -p ~/.cache/zsh ~/.cache/zsh-utils
 
+# Project read-only host AI config homes into writable container-local copies.
+# Runtime data is excluded; durable state is linked back through .ai-writeback.
+RSYNC_OPTS=(-a)
+
+_project_host_dir() {
+    local tool="$1" src="$2" dst="$3"
+    [ -d "$src" ] || return 0
+    rm -rf "$dst"
+    mkdir -p "$dst"
+
+    if command -v rsync >/dev/null 2>&1; then
+        case "$tool" in
+            claude)
+                rsync "${RSYNC_OPTS[@]}" --exclude='projects/' --exclude='memory/' --exclude='plugins/cache/' --exclude='plugins/marketplaces/' --exclude='.claude/' --exclude='file-history/' --exclude='paste-cache/' --exclude='telemetry/' --exclude='shell-snapshots/' --exclude='backups/' --exclude='stats-cache.json' --exclude='cost-history.jsonl' --exclude='cost-mode' --exclude='statusline-stdin.log' --exclude='statusline-debug.log' --exclude='sessions/' --exclude='todos/' --exclude='tasks/' --exclude='teams/' --exclude='plans/' --exclude='logs/' --exclude='ide/' --exclude='downloads/' --exclude='debug/' "$src/" "$dst/" 2>/dev/null || true
+                ;;
+            gemini)
+                rsync "${RSYNC_OPTS[@]}" --exclude='tmp/' --exclude='memory/' --exclude='antigravity/memory/' --exclude='history/' --exclude='skills.bak.*' --exclude='logs/' "$src/" "$dst/" 2>/dev/null || true
+                ;;
+            codex)
+                rsync "${RSYNC_OPTS[@]}" --exclude='memory/' --exclude='memories/' --exclude='sessions/' --exclude='log/' --exclude='logs/' --exclude='logs_2.sqlite*' --exclude='tmp/' --exclude='.tmp/' --exclude='cache/' --exclude='plugins/cache/' --exclude='computer-use/' --exclude='ambient-suggestions/' "$src/" "$dst/" 2>/dev/null || true
+                ;;
+            cursor|junie|openclaude)
+                rsync "${RSYNC_OPTS[@]}" --exclude='tmp/' --exclude='.tmp/' --exclude='memory/' --exclude='cache/' --exclude='history/' --exclude='logs/' --exclude='sessions/' --exclude='projects/' --exclude='extensions/' --exclude='chats/' --exclude='plugins/cache/' --exclude='plugins/marketplaces/' "$src/" "$dst/" 2>/dev/null || true
+                ;;
+            opencode)
+                rsync "${RSYNC_OPTS[@]}" --exclude='tmp/' --exclude='memory/' --exclude='history/' --exclude='logs/' --exclude='sessions/' "$src/" "$dst/" 2>/dev/null || true
+                ;;
+            *)
+                rsync "${RSYNC_OPTS[@]}" "$src/" "$dst/" 2>/dev/null || true
+                ;;
+        esac
+    else
+        cp -a "$src/." "$dst/" 2>/dev/null || true
+    fi
+}
+
+_project_host_file() {
+    local src="$1" dst="$2"
+    [ -f "$src" ] || return 0
+    mkdir -p "$(dirname "$dst")"
+    cp -p "$src" "$dst"
+}
+
+_link_writeback_dir() {
+    local src="$1" dst="$2"
+    [ -d "$src" ] || return 0
+    rm -rf "$dst"
+    mkdir -p "$(dirname "$dst")"
+    ln -s "$src" "$dst"
+}
+
+_link_writeback_file() {
+    local src="$1" dst="$2"
+    [ -e "$src" ] || return 0
+    rm -f "$dst"
+    mkdir -p "$(dirname "$dst")"
+    ln -s "$src" "$dst"
+}
+
+_project_host_dir claude "$HOME/.claude-host" "$HOME/.claude"
+_project_host_dir codex "$HOME/.codex-host" "$HOME/.codex"
+_project_host_dir gemini "$HOME/.gemini-host" "$HOME/.gemini"
+_project_host_dir cursor "$HOME/.cursor-host" "$HOME/.cursor"
+_project_host_dir junie "$HOME/.junie-host" "$HOME/.junie"
+_project_host_dir openclaude "$HOME/.openclaude-host" "$HOME/.openclaude"
+_project_host_dir antigravity "$HOME/.antigravity-host" "$HOME/.antigravity"
+_project_host_dir mcp-auth "$HOME/.mcp-auth-host" "$HOME/.mcp-auth"
+_project_host_dir opencode "$HOME/.config/opencode-host" "$HOME/.config/opencode"
+_project_host_dir gh "$HOME/.config/gh-host" "$HOME/.config/gh"
+_project_host_dir gcloud "$HOME/.config/gcloud-host" "$HOME/.config/gcloud"
+_project_host_file "$HOME/.claude-json-host" "$HOME/.claude.json"
+
+_link_writeback_file "$HOME/.ai-writeback/claude-cost-history.jsonl" "$HOME/.claude/cost-history.jsonl"
+_link_writeback_file "$HOME/.ai-writeback/claude-cost-mode" "$HOME/.claude/cost-mode"
+_link_writeback_dir "$HOME/.ai-writeback/claude-memory" "$HOME/.claude/memory"
+_link_writeback_dir "$HOME/.ai-writeback/codex-memory" "$HOME/.codex/memory"
+_link_writeback_dir "$HOME/.ai-writeback/codex-memories" "$HOME/.codex/memories"
+_link_writeback_dir "$HOME/.ai-writeback/gemini-memory" "$HOME/.gemini/memory"
+_link_writeback_dir "$HOME/.ai-writeback/gemini-antigravity-memory" "$HOME/.gemini/antigravity/memory"
+_link_writeback_dir "$HOME/.ai-writeback/cursor-memory" "$HOME/.cursor/memory"
+_link_writeback_dir "$HOME/.ai-writeback/junie-memory" "$HOME/.junie/memory"
+_link_writeback_dir "$HOME/.ai-writeback/openclaude-memory" "$HOME/.openclaude/memory"
+_link_writeback_dir "$HOME/.ai-writeback/opencode-memory" "$HOME/.config/opencode/memory"
+_link_writeback_dir "$HOME/.ai-writeback/engram-spool-vector" "$HOME/.engram/spool/vector"
+_link_writeback_dir "$HOME/.antidote-cache-host" "$HOME/.cache/antidote"
+
+if [ -d "$HOME/.ai-writeback/claude-project-memory-current" ]; then
+    _project_key=$(pwd -P | sed 's#[^A-Za-z0-9._-]#-#g')
+    _link_writeback_dir "$HOME/.ai-writeback/claude-project-memory-current" "$HOME/.claude/projects/${_project_key}/memory"
+fi
+
 echo ""
 echo "Tool versions:"
 node --version 2>/dev/null || true
@@ -26,35 +117,6 @@ fi
 echo ""
 echo "Dev container ready!"
 
-
-# =============================================================================
-# Detects Rancher Desktop vs Docker Desktop and rewrites 127.0.0.1 MCP URLs.
-# ~/.claude.json is a read-only staged mount; the patch writes a container-local copy.
-_detect_host_internal() {
-    if getent hosts host.rancher-desktop.internal >/dev/null 2>&1 || \
-       ping -c1 -W1 host.rancher-desktop.internal >/dev/null 2>&1; then
-        echo "host.rancher-desktop.internal"
-    else
-        echo "host.docker.internal"
-    fi
-}
-
-if [ -f /tmp/claude-host.json ]; then
-    _host_alias=$(_detect_host_internal)
-    python3 -c "
-import json, os, sys
-host = sys.argv[1]
-with open('/tmp/claude-host.json') as f:
-    d = json.load(f)
-for name, mcp in d.get('mcpServers', {}).items():
-    cmd = mcp.get('command', '')
-    if cmd and '/Users/' in cmd and any(t in cmd for t in ['bun', 'node']):
-        mcp['command'] = os.path.basename(cmd)
-with open(os.path.expanduser('~/.claude.json'), 'w') as f:
-    json.dump(d, f, indent=2)
-print(f'Claude MCP URLs: 127.0.0.1 -> {host}')
-" "$_host_alias"
-fi
 
 # =============================================================================
 # AI tool MCP configs — patch 127.0.0.1 URLs for container networking
@@ -103,8 +165,42 @@ _patch_mcp_toml() {
 }
 
 _HOST=$(_detect_host_internal)
-_patch_mcp_json /tmp/claude-host.json "$HOME/.claude.json" "$_HOST"
+
+_rewrite_config_file() {
+    local file="$1" tool="${2:-}"
+    [ -f "$file" ] || return 0
+    sed -i -E "s#http://(127\.0\.0\.1|localhost|host\.docker\.internal|host\.rancher-desktop\.internal)#http://${_HOST}#g" "$file" 2>/dev/null || true
+    sed -i "s|/Users/[^/]*/\.bun/bin|/home/vscode/.bun/bin|g" "$file" 2>/dev/null || true
+    sed -i "s|/Users/[^/]*/\.local/bin|/home/vscode/.local/bin|g" "$file" 2>/dev/null || true
+    sed -i "s|/Users/[^/]*/\.local/share/thalamus|/home/vscode/.local/share/thalamus|g" "$file" 2>/dev/null || true
+    if [ -n "$tool" ]; then
+        sed -i "s|/Users/[^/]*/\.${tool}|/home/vscode/.${tool}|g" "$file" 2>/dev/null || true
+    fi
+    sed -i "s|/Users/[^/]*/\.config/opencode|/home/vscode/.config/opencode|g" "$file" 2>/dev/null || true
+    sed -i 's|/opt/homebrew/bin|/usr/bin|g' "$file" 2>/dev/null || true
+    sed -i 's|/opt/homebrew/sbin|/usr/sbin|g' "$file" 2>/dev/null || true
+}
+
+for _tool in claude codex gemini cursor junie openclaude; do
+    _dir="$HOME/.${_tool}"
+    [ -d "$_dir" ] || continue
+    find "$_dir" \( -name "*.json" -o -name "*.jsonc" -o -name "*.toml" \) 2>/dev/null | while read -r _file; do
+        _rewrite_config_file "$_file" "$_tool"
+    done
+done
+if [ -d "$HOME/.config/opencode" ]; then
+    find "$HOME/.config/opencode" \( -name "*.json" -o -name "*.jsonc" -o -name "*.toml" \) 2>/dev/null | while read -r _file; do
+        _rewrite_config_file "$_file" opencode
+    done
+fi
+_rewrite_config_file "$HOME/.claude.json" claude
+
+_patch_mcp_json "$HOME/.claude.json"                       "$HOME/.claude.json"                       "$_HOST"
 _patch_mcp_json "$HOME/.cursor/mcp.json"                    "$HOME/.cursor/mcp.json"                    "$_HOST"
 _patch_mcp_json "$HOME/.gemini/antigravity/mcp.json"        "$HOME/.gemini/antigravity/mcp.json"        "$_HOST"
+_patch_mcp_json "$HOME/.gemini/antigravity/mcp_config.json" "$HOME/.gemini/antigravity/mcp_config.json" "$_HOST"
 _patch_mcp_json "$HOME/.gemini/settings.json"               "$HOME/.gemini/settings.json"               "$_HOST"
+_patch_mcp_json "$HOME/.openclaude/settings.json"           "$HOME/.openclaude/settings.json"           "$_HOST"
+_patch_mcp_json "$HOME/.config/opencode/opencode.json"      "$HOME/.config/opencode/opencode.json"      "$_HOST"
+_patch_mcp_json "$HOME/.junie/config.json"                  "$HOME/.junie/config.json"                  "$_HOST"
 _patch_mcp_toml "$HOME/.codex/config.toml"                  "$_HOST"
