@@ -220,8 +220,8 @@ _rewrite_config_file() {
         sed -i "s|/Users/[^/]*/\.${tool}|/home/vscode/.${tool}|g" "$file" 2>/dev/null || true
     fi
     sed -i "s|/Users/[^/]*/\.config/opencode|/home/vscode/.config/opencode|g" "$file" 2>/dev/null || true
-    sed -i 's|/opt/homebrew/bin|/usr/bin|g' "$file" 2>/dev/null || true
-    sed -i 's|/opt/homebrew/sbin|/usr/sbin|g' "$file" 2>/dev/null || true
+    sed -i 's|/opt/homebrew/bin|/usr/local/share/nvm/current/bin|g' "$file" 2>/dev/null || true
+    sed -i 's|/opt/homebrew/sbin|/home/linuxbrew/.linuxbrew/sbin|g' "$file" 2>/dev/null || true
 }
 
 for _tool in claude codex gemini cursor junie openclaude; do
