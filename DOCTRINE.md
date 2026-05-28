@@ -161,4 +161,4 @@ assignments go through the `proposals/` workflow:
 3. Implement
 4. Archive with shipped status
 
-Active open proposal: `proposals/devcontainer-image-hierarchy/`
+Active open proposal: `proposals/template-expansion/`
