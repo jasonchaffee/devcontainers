@@ -39,6 +39,7 @@
     // =========================================================================
     "ghcr.io/jasonchaffee/devcontainers/uv:1": {},
     "ghcr.io/jasonchaffee/devcontainers/antidote:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/bun:1": {},
     "ghcr.io/jasonchaffee/devcontainers/modern-cli:1": {},
     "ghcr.io/jasonchaffee/devcontainers/shell-dev:1": {},
     "ghcr.io/jasonchaffee/devcontainers/http-tools:1": {},
