@@ -1,5 +1,6 @@
 ---
-status: draft
+status: shipped
+archived-at: 2026-05-28
 format: prose
 ---
 

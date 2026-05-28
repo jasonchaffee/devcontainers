@@ -1,6 +1,7 @@
 ---
 id: devcontainer-template-expansion
-status: draft
+status: shipped
+archived-at: 2026-05-28
 format: rfc2119+gherkin
 created: 2026-05-28
 type: feature

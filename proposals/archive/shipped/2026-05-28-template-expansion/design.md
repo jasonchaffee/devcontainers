@@ -1,6 +1,7 @@
 ---
 id: template-expansion-design
-status: draft
+status: shipped
+archived-at: 2026-05-28
 format: prose
 proposal: template-expansion
 ---
