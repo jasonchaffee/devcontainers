@@ -7,11 +7,6 @@ echo "Setting up Python devcontainer..."
 # Git safe.directory — workspace is owned by a different UID than vscode
 sudo git config --system --add safe.directory '*'
 
-# Force antidote to regenerate the compiled plugins file on first shell open.
-# The baked image may contain a stale ~/.zsh_plugins.zsh that references
-# a plugin cache that does not exist in this container.
-rm -f "$HOME/.zsh_plugins.zsh"
-
 # Cache directories
 sudo mkdir -p ~/.cache
 sudo chown -R "$(whoami)" ~/.cache
@@ -21,6 +16,11 @@ echo ""
 echo "Tool versions:"
 python3 --version 2>/dev/null || true
 uv --version 2>/dev/null || true
+claude --version 2>/dev/null | head -1
+codex --version 2>/dev/null | head -1
+if command -v gemini >/dev/null 2>&1; then
+    gemini --version 2>/dev/null | head -1
+fi
 
 echo ""
 echo "Dev container ready!"
@@ -46,7 +46,6 @@ host = sys.argv[1]
 with open('/tmp/claude-host.json') as f:
     d = json.load(f)
 for name, mcp in d.get('mcpServers', {}).items():
-    mcp['args'] = [str(a).replace('http://127.0.0.1', f'http://{host}') for a in mcp.get('args', [])]
     cmd = mcp.get('command', '')
     if cmd and '/Users/' in cmd and any(t in cmd for t in ['bun', 'node']):
         mcp['command'] = os.path.basename(cmd)
@@ -54,17 +53,6 @@ with open(os.path.expanduser('~/.claude.json'), 'w') as f:
     json.dump(d, f, indent=2)
 print(f'Claude MCP URLs: 127.0.0.1 -> {host}')
 " "$_host_alias"
-fi
-
-# Initialize antidote plugin cache
-# Force regeneration so the cache is populated in this container.
-# (The compiled ~/.zsh_plugins.zsh may reference a cache that does not
-# exist in a fresh container; antidote bundle clones all plugins.)
-if command -v antidote >/dev/null 2>&1 && [ -f "$HOME/.zsh_plugins.txt" ]; then
-    echo "Initializing antidote plugin cache..."
-    zsh -c "source \$(antidote home)/antidote.zsh && antidote bundle < $HOME/.zsh_plugins.txt > $HOME/.zsh_plugins.zsh" 2>/dev/null || \
-    antidote bundle < "$HOME/.zsh_plugins.txt" > "$HOME/.zsh_plugins.zsh" 2>/dev/null || \
-    echo "Warning: antidote bundle failed (non-fatal — plugins may be missing)"
 fi
 
 # =============================================================================
@@ -85,9 +73,17 @@ _patch_mcp_json() {
     python3 -c "
 import json, sys, os
 host = sys.argv[1]; src = sys.argv[2]; dst = sys.argv[3]
+def rewrite_urls(value):
+    if isinstance(value, str):
+        return value.replace('http://127.0.0.1', f'http://{host}')
+    if isinstance(value, list):
+        return [rewrite_urls(item) for item in value]
+    if isinstance(value, dict):
+        return {key: rewrite_urls(item) for key, item in value.items()}
+    return value
 with open(src) as f: d = json.load(f)
+d = rewrite_urls(d)
 for mcp in d.get('mcpServers', {}).values():
-    mcp['args'] = [str(a).replace('http://127.0.0.1', f'http://{host}') for a in mcp.get('args', [])]
     cmd = mcp.get('command', '')
     if cmd and '/Users/' in cmd and any(t in cmd for t in ['bun','node']):
         mcp['command'] = os.path.basename(cmd)

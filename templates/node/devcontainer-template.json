@@ -16,10 +16,10 @@
       "default": "latest",
       "description": "Claude Code CLI version (e.g., '2.1.20' or 'latest')"
     },
-    "installGemini": {
-      "type": "boolean",
-      "default": false,
-      "description": "Install Google Gemini CLI"
+    "geminiVersion": {
+      "type": "string",
+      "default": "latest",
+      "description": "Google Gemini CLI version (e.g., '0.1.0' or 'latest')"
     }
   }
 }

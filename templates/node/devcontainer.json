@@ -53,12 +53,14 @@
     },
     "ghcr.io/jasonchaffee/devcontainers/codex:1": {
       "version": "latest"
+    },
+    "ghcr.io/jasonchaffee/devcontainers/gemini-cli:1": {
+      "version": "${templateOption:geminiVersion}"
     }
 
     // =========================================================================
     // Optional — uncomment as needed
     // =========================================================================
-    // "ghcr.io/jasonchaffee/devcontainers/gemini-cli:1": { "version": "latest" },
     // "ghcr.io/jasonchaffee/devcontainers/gcloud-cli:1": { "version": "latest" },
     // "ghcr.io/grafana/devcontainer-features/k6:1": {}
   },
