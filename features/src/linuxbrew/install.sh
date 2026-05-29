@@ -61,6 +61,14 @@ chgrp -R linuxbrew /home/linuxbrew 2>/dev/null || true
 chmod -R g+rwX /home/linuxbrew 2>/dev/null || true
 find /home/linuxbrew -type d -exec chmod g+s {} + 2>/dev/null || true
 
+harden_zsh_completions() {
+    for path in "${BREW_PREFIX}/share/zsh" "${BREW_PREFIX}/Homebrew/completions/zsh"; do
+        [ -e "${path}" ] || continue
+        chown -R root:root "${path}" 2>/dev/null || true
+        chmod -R go-w "${path}" 2>/dev/null || true
+    done
+}
+
 mkdir -p /etc/profile.d /usr/local/bin
 cat >/etc/profile.d/linuxbrew.sh <<EOF
 export HOMEBREW_PREFIX="${BREW_PREFIX}"
@@ -77,6 +85,8 @@ if [ -n "${INSTALLPACKAGES}" ]; then
     # shellcheck disable=SC2086
     su - linuxbrew -c "eval \"\$(${BREW_BIN} shellenv)\" && ${BREW_BIN} install ${INSTALLPACKAGES}"
 fi
+
+harden_zsh_completions
 
 "${BREW_BIN}" --version
 echo "Linuxbrew installed successfully!"

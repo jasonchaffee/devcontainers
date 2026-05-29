@@ -19,8 +19,8 @@ RSYNC_OPTS=(-a)
 _project_host_dir() {
     local tool="$1" src="$2" dst="$3"
     [ -d "$src" ] || return 0
-    rm -rf "$dst"
-    mkdir -p "$dst"
+    rm -rf "$dst" 2>/dev/null || true
+    mkdir -p "$dst" 2>/dev/null || return 0
 
     if command -v rsync >/dev/null 2>&1; then
         case "$tool" in
@@ -51,24 +51,24 @@ _project_host_dir() {
 _project_host_file() {
     local src="$1" dst="$2"
     [ -f "$src" ] || return 0
-    mkdir -p "$(dirname "$dst")"
-    cp -p "$src" "$dst"
+    mkdir -p "$(dirname "$dst")" 2>/dev/null || return 0
+    cp -p "$src" "$dst" 2>/dev/null || true
 }
 
 _link_writeback_dir() {
     local src="$1" dst="$2"
     [ -d "$src" ] || return 0
-    rm -rf "$dst"
-    mkdir -p "$(dirname "$dst")"
-    ln -s "$src" "$dst"
+    rm -rf "$dst" 2>/dev/null || true
+    mkdir -p "$(dirname "$dst")" 2>/dev/null || return 0
+    ln -s "$src" "$dst" 2>/dev/null || true
 }
 
 _link_writeback_file() {
     local src="$1" dst="$2"
     [ -e "$src" ] || return 0
-    rm -f "$dst"
-    mkdir -p "$(dirname "$dst")"
-    ln -s "$src" "$dst"
+    rm -f "$dst" 2>/dev/null || true
+    mkdir -p "$(dirname "$dst")" 2>/dev/null || return 0
+    ln -s "$src" "$dst" 2>/dev/null || true
 }
 
 _project_host_dir claude "$HOME/.claude-host" "$HOME/.claude"
@@ -96,7 +96,39 @@ _link_writeback_dir "$HOME/.ai-writeback/junie-memory" "$HOME/.junie/memory"
 _link_writeback_dir "$HOME/.ai-writeback/openclaude-memory" "$HOME/.openclaude/memory"
 _link_writeback_dir "$HOME/.ai-writeback/opencode-memory" "$HOME/.config/opencode/memory"
 _link_writeback_dir "$HOME/.ai-writeback/engram-spool-vector" "$HOME/.engram/spool/vector"
-_link_writeback_dir "$HOME/.antidote-cache-host" "$HOME/.cache/antidote"
+_project_host_dir antidote "$HOME/.antidote-cache-host" "$HOME/.cache/antidote"
+
+_repair_antidote_bundle() {
+    local static="$HOME/.zsh_plugins.zsh"
+    local bundle="$HOME/.zsh_plugins.txt"
+    local antidote="$HOME/.antidote/antidote.zsh"
+    local marker="$HOME/.cache/antidote/.antidote.load"
+    local needs_rebuild=0
+    local target
+
+    [ -f "$bundle" ] || return 0
+    [ -f "$antidote" ] || return 0
+
+    if [ ! -f "$static" ] || [ "$static" -ot "$bundle" ]; then
+        needs_rebuild=1
+    else
+        while IFS= read -r target; do
+            case "$target" in
+                \$HOME/*) target="${HOME}${target#\$HOME}" ;;
+                \~/*) target="${HOME}${target#\~}" ;;
+            esac
+            if [ -n "$target" ] && [ ! -e "$target" ]; then
+                needs_rebuild=1
+                break
+            fi
+        done < <(sed -nE 's/^[[:space:]]*(zsh-defer[[:space:]]+)?source[[:space:]]+"([^"]+)".*/\2/p' "$static")
+    fi
+
+    [ "$needs_rebuild" -eq 1 ] || return 0
+    rm -f "$static" "${static}.zwc" "$marker"
+    zsh -fc 'source "$HOME/.antidote/antidote.zsh"; zstyle ":antidote:bundle" use-friendly-names "yes"; antidote load' >/dev/null 2>&1 || true
+}
+_repair_antidote_bundle
 
 if [ -d "$HOME/.ai-writeback/claude-project-memory-current" ]; then
     _project_key=$(pwd -P | sed 's#[^A-Za-z0-9._-]#-#g')
@@ -137,7 +169,7 @@ _detect_host_internal() {
 
 _patch_mcp_json() {
     local src="$1" dst="$2" host="$3"
-    [ -f "$src" ] || return 0
+    [ -s "$src" ] || return 0
     python3 -c "
 import json, sys, os
 host = sys.argv[1]; src = sys.argv[2]; dst = sys.argv[3]
@@ -228,6 +260,10 @@ _rewrite_config_file() {
     sed -i "s|/Users/[^/]*/\.config/opencode|/home/vscode/.config/opencode|g" "$file" 2>/dev/null || true
     sed -i 's|/opt/homebrew/bin|/usr/local/share/nvm/current/bin|g' "$file" 2>/dev/null || true
     sed -i 's|/opt/homebrew/sbin|/home/linuxbrew/.linuxbrew/sbin|g' "$file" 2>/dev/null || true
+    sed -i 's|/usr/local/etc/openssl/certs/combined_cacerts.pem|/etc/ssl/certs/ca-certificates.crt|g' "$file" 2>/dev/null || true
+    sed -i 's|/opt/homebrew/etc/openssl/certs/combined_cacerts.pem|/etc/ssl/certs/ca-certificates.crt|g' "$file" 2>/dev/null || true
+    sed -i 's|/usr/local/etc/openssl@3/cert.pem|/etc/ssl/certs/ca-certificates.crt|g' "$file" 2>/dev/null || true
+    sed -i 's|/opt/homebrew/etc/openssl@3/cert.pem|/etc/ssl/certs/ca-certificates.crt|g' "$file" 2>/dev/null || true
 }
 
 for _tool in claude codex gemini cursor junie openclaude; do
@@ -243,6 +279,7 @@ if [ -d "$HOME/.config/opencode" ]; then
     done
 fi
 _rewrite_config_file "$HOME/.claude.json" claude
+_rewrite_config_file "$HOME/.codex/config.toml" codex
 
 _patch_mcp_json "$HOME/.claude.json"                       "$HOME/.claude.json"                       "$_HOST"
 _patch_mcp_json "$HOME/.cursor/mcp.json"                    "$HOME/.cursor/mcp.json"                    "$_HOST"

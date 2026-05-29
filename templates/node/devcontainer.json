@@ -39,7 +39,7 @@
     // Custom Features
     // =========================================================================
     "ghcr.io/jasonchaffee/devcontainers/bun:1": {},
-    "ghcr.io/jasonchaffee/devcontainers/linuxbrew:1.0.2": {},
+    "ghcr.io/jasonchaffee/devcontainers/linuxbrew:1.0.3": {},
     "ghcr.io/jasonchaffee/devcontainers/antidote:1": {},
     "ghcr.io/jasonchaffee/devcontainers/modern-cli:1": {},
     "ghcr.io/jasonchaffee/devcontainers/shell-dev:1": {},
@@ -170,7 +170,7 @@
     "source=${localEnv:HOME}/.openclaude/memory,target=/home/vscode/.ai-writeback/openclaude-memory,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.config/opencode/memory,target=/home/vscode/.ai-writeback/opencode-memory,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.engram/spool/vector,target=/home/vscode/.ai-writeback/engram-spool-vector,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.cache/antidote,target=/home/vscode/.antidote-cache-host,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.cache/antidote,target=/home/vscode/.antidote-cache-host,type=bind,consistency=cached,readonly",
     "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh-host,type=bind,consistency=cached,readonly",
     "source=${localEnv:HOME}/.zshrc,target=/home/vscode/.zshrc,type=bind,consistency=cached,readonly",
     "source=${localEnv:HOME}/.zprofile,target=/home/vscode/.zprofile,type=bind,consistency=cached,readonly",
