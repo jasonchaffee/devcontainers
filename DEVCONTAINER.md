@@ -67,13 +67,15 @@ Copy your default `.devcontainer/devcontainer.json` into `.devcontainer/multi-re
 
 ```json
 "mounts": [
-  "source=${localEnv:DEVCONTAINER_REPO_B_PATH:${localWorkspaceFolder}/../repo-b},target=/workspace/repo-b,type=${localEnv:DEVCONTAINER_REPO_B_MOUNT_TYPE:bind}"
+  "source=${localEnv:DEVCONTAINER_REPO_B_PATH:../repo-b},target=/workspace/repo-b,type=${localEnv:DEVCONTAINER_REPO_B_MOUNT_TYPE:bind}"
 ]
 ```
 
-Two independent env-var toggles here, both using [`${localEnv:VAR:default}`](https://containers.dev/implementors/json_reference/#variables-in-devcontainerjson) — a host env var with a fallback, applied per related repo. There's no standard clone layout across developers, so neither knob should ever be a hardcoded absolute path (`${localEnv:HOME}/Dev/<org>/repo-b`) — that only works for whoever happens to clone at that exact location:
+Two independent env-var toggles here, both using [`${localEnv:VAR:default}`](https://containers.dev/implementors/json_reference/#variables-in-devcontainerjson) — a host env var with a fallback, applied per related repo. There's no standard clone layout across developers, so neither knob should ever be a hardcoded absolute path (`${localEnv:HOME}/Dev/<org>/repo-b`) — that only works for whoever happens to clone at that exact location.
 
-- **`DEVCONTAINER_REPO_B_PATH`** — where the mount pulls from. Defaults to `${localWorkspaceFolder}/../repo-b` (a plain sibling of this repo), which is right for most developers with nothing set. Override it if `repo-b` lives somewhere else on your machine (a different parent folder, a different git host) — or, if you also set `DEVCONTAINER_REPO_B_MOUNT_TYPE` to `volume` below, override it with a Docker volume name instead of a path.
+**Never write `${localWorkspaceFolder}` (or any other `${...}`) inside the default portion of `${localEnv:VAR:default}`** — empirically verified (via `devcontainer read-configuration` and a live `devcontainer up`, against `@devcontainers/cli` 0.87.0) that the substitution engine can't parse a nested `${...}` there: `${localEnv:VAR:${localWorkspaceFolder}/../repo-b}` silently resolves to the garbled literal string `${localWorkspaceFolder/../repo-b}` instead of a real path, and the mount fails or binds nothing useful. A bare relative path like `../repo-b` works instead — the devcontainer CLI resolves relative bind-mount sources against the workspace folder regardless of what directory the calling IDE/CLI happened to be in when it invoked `docker run`, confirmed with a live container + `docker exec` round-trip.
+
+- **`DEVCONTAINER_REPO_B_PATH`** — where the mount pulls from. Defaults to `../repo-b` (a plain sibling of this repo), which is right for most developers with nothing set. Override it if `repo-b` lives somewhere else on your machine (a different parent folder, a different git host) — or, if you also set `DEVCONTAINER_REPO_B_MOUNT_TYPE` to `volume` below, override it with a Docker volume name instead of a path.
 - **`DEVCONTAINER_REPO_B_MOUNT_TYPE`** — how the mount is populated. Defaults to `bind`, exposing your existing local clone directly (live-editable, changes sync to the host instantly). Set it to `volume` for a container-local checkout with zero host footprint — useful if you don't have `repo-b` cloned at all. Either way, [`post-create.sh` cloning into empty mounts](#auto-cloning-into-empty-mounts) below means neither mode needs manual setup.
 
 `consistency=cached` is intentionally omitted from this mount — it's a bind-mount-only performance hint, and this mount can be either type.
