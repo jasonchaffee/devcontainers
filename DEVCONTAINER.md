@@ -40,9 +40,11 @@ Set this up as a **named configuration** rather than editing your default `.devc
 Copy your existing config into `.devcontainer/multi-repo/devcontainer.json` and point `workspaceMount` at the parent directory instead of just `repo-a` (source *and* target both change — the mount target becomes bare `/workspace` since the whole parent is what's mounted now). `workspaceFolder` conveniently stays the same value either way, since `repo-a` lands at `/workspace/repo-a` regardless of whether that came from a direct per-repo mount or from being a subdirectory of the mounted parent:
 
 ```json
-"workspaceMount": "source=${localEnv:HOME}/Dev/<org>,target=/workspace,type=bind,consistency=cached",
+"workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspace,type=bind,consistency=cached",
 "workspaceFolder": "/workspace/repo-a"
 ```
+
+`${localWorkspaceFolder}/..` is just "the parent of the repo you're opening" — no need to hardcode a home directory or org name, and it works regardless of what each developer's clone root is named. This only works if `repo-a`'s siblings genuinely share that same parent; if they don't, use Option 2 below instead.
 
 Then add a `.code-workspace` file (VS Code / Cursor) listing each sibling as a folder root, so all repos are visible and editable side by side in one window:
 
@@ -65,9 +67,11 @@ Copy your default `.devcontainer/devcontainer.json` into `.devcontainer/multi-re
 
 ```json
 "mounts": [
-  "source=${localEnv:HOME}/Dev/<org>/repo-b,target=/workspace/repo-b,type=bind,consistency=cached"
+  "source=${localEnv:REPO_B_PATH:${localWorkspaceFolder}/../repo-b},target=/workspace/repo-b,type=bind,consistency=cached"
 ]
 ```
+
+There's no standard clone layout across developers, so don't hardcode an absolute path (`${localEnv:HOME}/Dev/<org>/repo-b`) — it only works for whoever happens to clone at that exact location. Instead use [`${localEnv:VAR:default}`](https://containers.dev/implementors/json_reference/#variables-in-devcontainerjson) — a host env var with a fallback: `${localWorkspaceFolder}/../repo-b` assumes `repo-b` is a plain sibling of this repo, which is right for most developers by default, and `REPO_B_PATH` lets anyone whose layout differs (a different parent folder, a different git host) point at the real location without editing the config.
 
 Add a `.code-workspace` file listing each `/workspace/*` path as a folder root for a proper multi-root editor view:
 
@@ -96,11 +100,11 @@ Two ways to get a related repo's code onto its `/workspace/<repo>` path:
 
 ```json
 "mounts": [
-  "source=${localEnv:HOME}/Dev/<org>/repo-b,target=/workspace/repo-b,type=bind,consistency=cached"
+  "source=${localEnv:REPO_B_PATH:${localWorkspaceFolder}/../repo-b},target=/workspace/repo-b,type=bind,consistency=cached"
 ]
 ```
 
-Requires the repo already cloned on the host at that exact path — document this as a prerequisite for anyone else using the config, since Docker will silently bind an empty directory rather than failing if the path doesn't exist.
+Requires the repo already cloned on the host — by default at the sibling-relative path, or wherever `REPO_B_PATH` points if set. Document the env var name as a prerequisite for anyone else using the config, since Docker will silently bind an empty directory rather than failing if the resolved path doesn't exist.
 
 **Clone into a container-local volume (alternative)** — self-contained, works regardless of host directory layout or whether the repo is cloned locally at all. Trade-off: this is a *separate* checkout, disconnected from any host clone — changes made inside the container don't appear on the host unless you push and re-pull:
 
