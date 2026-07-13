@@ -67,16 +67,18 @@ Copy your default `.devcontainer/devcontainer.json` into `.devcontainer/multi-re
 
 ```json
 "mounts": [
-  "source=${localEnv:REPO_B_PATH:${localWorkspaceFolder}/../repo-b},target=/workspace/repo-b,type=${localEnv:REPO_B_MOUNT_TYPE:bind}"
+  "source=${localEnv:DEVCONTAINER_REPO_B_PATH:${localWorkspaceFolder}/../repo-b},target=/workspace/repo-b,type=${localEnv:DEVCONTAINER_REPO_B_MOUNT_TYPE:bind}"
 ]
 ```
 
 Two independent env-var toggles here, both using [`${localEnv:VAR:default}`](https://containers.dev/implementors/json_reference/#variables-in-devcontainerjson) — a host env var with a fallback, applied per related repo. There's no standard clone layout across developers, so neither knob should ever be a hardcoded absolute path (`${localEnv:HOME}/Dev/<org>/repo-b`) — that only works for whoever happens to clone at that exact location:
 
-- **`REPO_B_PATH`** — where the mount pulls from. Defaults to `${localWorkspaceFolder}/../repo-b` (a plain sibling of this repo), which is right for most developers with nothing set. Override it if `repo-b` lives somewhere else on your machine (a different parent folder, a different git host) — or, if you also set `REPO_B_MOUNT_TYPE` to `volume` below, override it with a Docker volume name instead of a path.
-- **`REPO_B_MOUNT_TYPE`** — how the mount is populated. Defaults to `bind`, exposing your existing local clone directly (live-editable, changes sync to the host instantly). Set it to `volume` for a container-local checkout with zero host footprint — useful if you don't have `repo-b` cloned at all. Either way, [`post-create.sh` cloning into empty mounts](#auto-cloning-into-empty-mounts) below means neither mode needs manual setup.
+- **`DEVCONTAINER_REPO_B_PATH`** — where the mount pulls from. Defaults to `${localWorkspaceFolder}/../repo-b` (a plain sibling of this repo), which is right for most developers with nothing set. Override it if `repo-b` lives somewhere else on your machine (a different parent folder, a different git host) — or, if you also set `DEVCONTAINER_REPO_B_MOUNT_TYPE` to `volume` below, override it with a Docker volume name instead of a path.
+- **`DEVCONTAINER_REPO_B_MOUNT_TYPE`** — how the mount is populated. Defaults to `bind`, exposing your existing local clone directly (live-editable, changes sync to the host instantly). Set it to `volume` for a container-local checkout with zero host footprint — useful if you don't have `repo-b` cloned at all. Either way, [`post-create.sh` cloning into empty mounts](#auto-cloning-into-empty-mounts) below means neither mode needs manual setup.
 
 `consistency=cached` is intentionally omitted from this mount — it's a bind-mount-only performance hint, and this mount can be either type.
+
+Both vars are prefixed `DEVCONTAINER_` on purpose, not just `REPO_B_*`: `${localEnv:...}` only resolves from your host environment, and GUI-launched IDEs (opened from Dock/Spotlight, not a terminal) don't automatically inherit your shell's exported variables on macOS — they need to be synced into `launchctl setenv` separately. If your setup does that sync with a script, matching every mount override to one `DEVCONTAINER_` prefix means the sync script can forward *any* variable starting with `DEVCONTAINER_` generically, instead of needing an edit every time a new repo combo adds new variable names.
 
 Add a `.code-workspace` file listing each `/workspace/*` path as a folder root for a proper multi-root editor view:
 
@@ -99,7 +101,7 @@ Keeping every repo as a direct child of `/workspace` (never one level deeper, in
 
 #### Auto-cloning into empty mounts
 
-`bind` mode requires the repo already cloned on the host — by default at the sibling-relative path, or wherever `REPO_B_PATH` points if set. `volume` mode starts out as an empty, container-local volume with nothing in it. Rather than document a manual clone step for either case, add a `.devcontainer/multi-repo/post-create.sh` that runs the default config's setup first, then clones into whichever related-repo mounts are still empty:
+`bind` mode requires the repo already cloned on the host — by default at the sibling-relative path, or wherever `DEVCONTAINER_REPO_B_PATH` points if set. `volume` mode starts out as an empty, container-local volume with nothing in it. Rather than document a manual clone step for either case, add a `.devcontainer/multi-repo/post-create.sh` that runs the default config's setup first, then clones into whichever related-repo mounts are still empty:
 
 ```bash
 #!/bin/bash
