@@ -67,11 +67,16 @@ Copy your default `.devcontainer/devcontainer.json` into `.devcontainer/multi-re
 
 ```json
 "mounts": [
-  "source=${localEnv:REPO_B_PATH:${localWorkspaceFolder}/../repo-b},target=/workspace/repo-b,type=bind,consistency=cached"
+  "source=${localEnv:REPO_B_PATH:${localWorkspaceFolder}/../repo-b},target=/workspace/repo-b,type=${localEnv:REPO_B_MOUNT_TYPE:bind}"
 ]
 ```
 
-There's no standard clone layout across developers, so don't hardcode an absolute path (`${localEnv:HOME}/Dev/<org>/repo-b`) — it only works for whoever happens to clone at that exact location. Instead use [`${localEnv:VAR:default}`](https://containers.dev/implementors/json_reference/#variables-in-devcontainerjson) — a host env var with a fallback: `${localWorkspaceFolder}/../repo-b` assumes `repo-b` is a plain sibling of this repo, which is right for most developers by default, and `REPO_B_PATH` lets anyone whose layout differs (a different parent folder, a different git host) point at the real location without editing the config.
+Two independent env-var toggles here, both using [`${localEnv:VAR:default}`](https://containers.dev/implementors/json_reference/#variables-in-devcontainerjson) — a host env var with a fallback, applied per related repo. There's no standard clone layout across developers, so neither knob should ever be a hardcoded absolute path (`${localEnv:HOME}/Dev/<org>/repo-b`) — that only works for whoever happens to clone at that exact location:
+
+- **`REPO_B_PATH`** — where the mount pulls from. Defaults to `${localWorkspaceFolder}/../repo-b` (a plain sibling of this repo), which is right for most developers with nothing set. Override it if `repo-b` lives somewhere else on your machine (a different parent folder, a different git host) — or, if you also set `REPO_B_MOUNT_TYPE` to `volume` below, override it with a Docker volume name instead of a path.
+- **`REPO_B_MOUNT_TYPE`** — how the mount is populated. Defaults to `bind`, exposing your existing local clone directly (live-editable, changes sync to the host instantly). Set it to `volume` for a container-local checkout with zero host footprint — useful if you don't have `repo-b` cloned at all. Either way, [`post-create.sh` cloning into empty mounts](#auto-cloning-into-empty-mounts) below means neither mode needs manual setup.
+
+`consistency=cached` is intentionally omitted from this mount — it's a bind-mount-only performance hint, and this mount can be either type.
 
 Add a `.code-workspace` file listing each `/workspace/*` path as a folder root for a proper multi-root editor view:
 
@@ -92,35 +97,35 @@ Add a `.code-workspace` file listing each `/workspace/*` path as a folder root f
 
 Keeping every repo as a direct child of `/workspace` (never one level deeper, inside a sibling) avoids this regardless of how many repos are in the mix.
 
-#### Populating each `/workspace/<repo>`: bind mount vs. clone into a volume
+#### Auto-cloning into empty mounts
 
-Two ways to get a related repo's code onto its `/workspace/<repo>` path:
+`bind` mode requires the repo already cloned on the host — by default at the sibling-relative path, or wherever `REPO_B_PATH` points if set. `volume` mode starts out as an empty, container-local volume with nothing in it. Rather than document a manual clone step for either case, add a `.devcontainer/multi-repo/post-create.sh` that runs the default config's setup first, then clones into whichever related-repo mounts are still empty:
 
-**Bind mount from host (default, recommended)** — exposes your existing local clone. Live-editable; changes sync to the host instantly, no duplication:
-
-```json
-"mounts": [
-  "source=${localEnv:REPO_B_PATH:${localWorkspaceFolder}/../repo-b},target=/workspace/repo-b,type=bind,consistency=cached"
-]
-```
-
-Requires the repo already cloned on the host — by default at the sibling-relative path, or wherever `REPO_B_PATH` points if set. Document the env var name as a prerequisite for anyone else using the config, since Docker will silently bind an empty directory rather than failing if the resolved path doesn't exist.
-
-**Clone into a container-local volume (alternative)** — self-contained, works regardless of host directory layout or whether the repo is cloned locally at all. Trade-off: this is a *separate* checkout, disconnected from any host clone — changes made inside the container don't appear on the host unless you push and re-pull:
-
-```json
-"mounts": [
-  "source=${localWorkspaceFolderBasename}-repo-b,target=/workspace/repo-b,type=volume"
-]
-```
 ```bash
-# In postCreateCommand / post-create.sh:
-if [ ! -d /workspace/repo-b/.git ]; then
-    git clone https://github.com/<org>/repo-b.git /workspace/repo-b
-fi
+#!/bin/bash
+set -e
+
+# Same setup as the default single-repo config.
+.devcontainer/post-create.sh
+
+clone_if_missing() {
+    local dir="$1" url="$2"
+    if [ ! -d "$dir/.git" ]; then
+        echo "Cloning $url into $dir..."
+        git clone "$url" "$dir"
+    fi
+}
+
+clone_if_missing /workspace/repo-b https://github.com/<org>/repo-b.git
 ```
 
-Default to the bind mount unless you specifically want a config that works without any host-side setup.
+Point `postCreateCommand` at this script instead of the default one:
+
+```json
+"postCreateCommand": ".devcontainer/multi-repo/post-create.sh"
+```
+
+This is unconditionally safe to run regardless of which mode a mount is in: a `bind` mount to an existing clone already has `.git`, so `clone_if_missing` is a no-op there; an empty `volume`, or a `bind` mount to a host path that didn't exist yet (Docker creates it empty rather than failing), both get populated automatically on first boot. `postStartCommand` doesn't need a multi-repo-specific variant — keep it pointed at the default `.devcontainer/post-start.sh`.
 
 ### Which to use
 
