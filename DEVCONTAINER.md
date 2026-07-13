@@ -131,6 +131,14 @@ Point `postCreateCommand` at this script instead of the default one:
 
 This is unconditionally safe to run regardless of which mode a mount is in: a `bind` mount to an existing clone already has `.git`, so `clone_if_missing` is a no-op there; an empty `volume`, or a `bind` mount to a host path that didn't exist yet (Docker creates it empty rather than failing), both get populated automatically on first boot. `postStartCommand` doesn't need a multi-repo-specific variant — keep it pointed at the default `.devcontainer/post-start.sh`.
 
+#### The multi-repo variant needs the *union* of every mounted repo's toolchain
+
+If the related repos use different base images (e.g. one repo's default `devcontainer.json` uses an infra/Terraform-flavored image, another uses a Java/Maven-flavored one), the multi-repo variant only gets whichever image it happens to be built from — mounting another repo's files doesn't give you that repo's build tools. Someone can browse a mounted repo's code but not actually build or validate it.
+
+The fix is to add the *other* repos' missing features directly to the multi-repo `devcontainer.json`'s own `features` block, on top of whichever base image it already uses — features compose regardless of what the base image already has, as long as everything shares a common lineage (no OS/architecture mismatch). Check what each related repo's own local tooling actually requires (a build script's `command -v` checks are a good source of truth) rather than assuming — a repo can have real, non-obvious runtime dependencies (e.g. a validation script needing `ruby` when nothing else in the toolchain uses it).
+
+This makes the multi-repo variant's feature set deliberately *heavier* than any single-repo default — which is itself a reason to keep it a separate named config rather than merging into any one repo's default: forcing every single-repo session to carry a combined toolchain it doesn't need is real, avoidable bloat.
+
 ### Which to use
 
 Both give a true multi-root editor view (all repos as first-class folders via a `.code-workspace` file), and neither touches `workspaceMount`/`workspaceFolder` for the primary repo — only the disk layout differs:
