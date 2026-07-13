@@ -2,6 +2,8 @@
 
 A collection of development container features and templates following the [Dev Container specification](https://containers.dev/).
 
+See [DEVCONTAINER.md](DEVCONTAINER.md) for choosing a template, multi-repo devcontainer setup, and troubleshooting.
+
 ## Structure
 
 ```

@@ -185,5 +185,12 @@
   "postCreateCommand": ".devcontainer/post-create.sh",
   "postStartCommand": ".devcontainer/post-start.sh",
 
+  // IntelliJ/JetBrains Gateway ignores the default workspace path unless workspaceMount
+  // and workspaceFolder are explicitly set (mounts at /IdeaProjects otherwise). Repo name
+  // is included (not bare /workspace) so a multi-repo devcontainer.json can mount related
+  // repos as siblings under /workspace without changing this path — see DEVCONTAINER.md.
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+  "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
+
   "remoteUser": "vscode"
 }
