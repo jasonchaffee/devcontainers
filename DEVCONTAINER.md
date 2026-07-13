@@ -37,7 +37,7 @@ Set this up as a **named configuration** rather than editing your default `.devc
 .devcontainer/multi-repo/devcontainer.json   # parent-mount variant
 ```
 
-`multi-repo` here is just a placeholder — name the folder for whatever it actually represents once there's real content behind it (a portfolio or team name, e.g. `.devcontainer/emp/` for an "Entity Management Platform" repo set). A generic name reads fine for an empty example; a real one is clearer once the config carries real, specific tooling.
+`multi-repo` here is just a placeholder — name the folder for whatever it actually represents once there's real content behind it (a project or team name). A generic name reads fine for an empty example; a real one is clearer once the config carries real, specific tooling.
 
 Copy your existing config into `.devcontainer/multi-repo/devcontainer.json` and point `workspaceMount` at the parent directory instead of just `repo-a` (source *and* target both change — the mount target becomes bare `/workspace` since the whole parent is what's mounted now). `workspaceFolder` conveniently stays the same value either way, since `repo-a` lands at `/workspace/repo-a` regardless of whether that came from a direct per-repo mount or from being a subdirectory of the mounted parent:
 
