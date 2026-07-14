@@ -38,6 +38,14 @@
 
   "remoteUser": "vscode",
 
+  // Block the IDE from attaching until postCreate finishes. JetBrains Gateway
+  // otherwise connects at the default waitFor (updateContentCommand) — the
+  // backend reads .idea/ and writes its own default misc.xml before
+  // setup_jetbrains_modules runs, clobbering the module wiring. Waiting for
+  // postCreate makes the IDE read the final files. (VS Code/Cursor don't need
+  // this, but it's harmless for them.)
+  "waitFor": "postCreateCommand",
+
   // Chain to THIS folder's post-create.sh (clones empty siblings + sets up
   // IntelliJ modules), not the default one.
   "postCreateCommand": ".devcontainer/multi-repo/post-create.sh",
