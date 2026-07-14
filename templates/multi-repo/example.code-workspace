@@ -1,0 +1,15 @@
+{
+  // Multi-root workspace for VS Code / Cursor / Antigravity — open this file
+  // (File > Open Workspace from File) once the container is up to see every
+  // repo as a first-class folder. JetBrains ignores this; it uses the modules
+  // registered by post-create.sh instead.
+  //
+  // EDIT: one entry per repo, each pointing at /workspace/<name>. Keep every
+  // repo a DIRECT child of /workspace — never nested inside another repo.
+  "folders": [
+    { "path": "/workspace/repo-a" },
+    { "path": "/workspace/repo-b" },
+    { "path": "/workspace/repo-c" }
+  ],
+  "settings": {}
+}

@@ -1,0 +1,45 @@
+{
+  // ==========================================================================
+  // Multi-repo devcontainer — OVERLAY example (per-repo `mounts`, Option 2).
+  //
+  // This is a STARTING POINT, not a drop-in. Steps to adapt:
+  //   1. Copy this folder into your primary repo as a NAMED config dir, e.g.
+  //      .devcontainer/multi-repo/  (or a portfolio name).
+  //   2. Replace "image" with the same base your default
+  //      .devcontainer/devcontainer.json uses (java / node / python), OR add
+  //      the union of every mounted repo's features (see DEVCONTAINER.md →
+  //      "The multi-repo variant needs the union of every mounted repo's toolchain").
+  //   3. Edit the `mounts` list: one entry per sibling repo, each targeting
+  //      /workspace/<sibling-name>.
+  //   4. Edit post-create.sh (clone_if_missing calls + the maven/plain sibling
+  //      lists in setup_intellij_modules).
+  //   5. Edit example.code-workspace to list every repo (VS Code/Cursor/Antigravity).
+  //
+  // The primary repo keeps the default /workspace/<its-own-name> layout via
+  // workspaceMount/workspaceFolder — only the extra sibling `mounts` are added.
+  // See DEVCONTAINER.md → "Multi-Repo Development" for the full rationale.
+  // ==========================================================================
+  "name": "Multi-Repo (repo-a + siblings)",
+
+  // EDIT: match your default config's base image / template (java / node / python).
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  // Primary repo stays at /workspace/<its-own-name>; siblings mount alongside it.
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+  "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
+
+  // EDIT: one entry per sibling repo. Both knobs are host env vars with sane
+  // sibling-relative defaults; prefix DEVCONTAINER_ so a GUI-launcher sync can
+  // forward them generically. NEVER put a nested ${...} inside the :default.
+  "mounts": [
+    "source=${localEnv:DEVCONTAINER_REPO_B_PATH:../repo-b},target=/workspace/repo-b,type=${localEnv:DEVCONTAINER_REPO_B_MOUNT_TYPE:bind}",
+    "source=${localEnv:DEVCONTAINER_REPO_C_PATH:../repo-c},target=/workspace/repo-c,type=${localEnv:DEVCONTAINER_REPO_C_MOUNT_TYPE:bind}"
+  ],
+
+  "remoteUser": "vscode",
+
+  // Chain to THIS folder's post-create.sh (clones empty siblings + sets up
+  // IntelliJ modules), not the default one.
+  "postCreateCommand": ".devcontainer/multi-repo/post-create.sh",
+  "postStartCommand": ".devcontainer/post-start.sh"
+}

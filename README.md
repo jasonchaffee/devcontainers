@@ -36,6 +36,8 @@ cp -r templates/java your-project/.devcontainer
 
 Then open in VS Code/Cursor and use "Reopen in Container".
 
+**Working across several related repos at once?** See [`templates/multi-repo/`](templates/multi-repo/) — an overlay (layered on any base template) that mounts sibling repos into one container and wires them up as folders (VS Code/Cursor) and modules (JetBrains). Full details in [DEVCONTAINER.md → Multi-Repo Development](DEVCONTAINER.md#multi-repo-development).
+
 ## Features
 
 Each feature in `features/` can be used independently in any devcontainer.json:

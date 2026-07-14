@@ -24,6 +24,8 @@ Then open in VS Code/Cursor and use "Reopen in Container", or see README.md for 
 
 By default, a devcontainer mounts and opens exactly one repo — the one whose `.devcontainer/` you launched, at `/workspace/${localWorkspaceFolderBasename}` (e.g. `/workspace/my-project`). The repo name is part of the path specifically so a multi-repo config can mount related repos as siblings under the same `/workspace` prefix without changing where the primary repo lives.
 
+> **Copy-and-adapt starting point:** a ready-made overlay lives at [`templates/multi-repo/`](templates/multi-repo/) — an example `devcontainer.json`, the `post-create.sh` (auto-clone + IntelliJ module wiring, with the verified `misc.xml`/`modules.xml` patch logic), an example `.code-workspace`, and its own README. The rest of this section explains what those files do and why.
+
 Both approaches below are part of the [official Dev Containers specification](https://containers.dev/implementors/spec) — no custom tooling required.
 
 ### Option 1 — Mount the parent directory (full multi-root)
