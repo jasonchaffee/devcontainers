@@ -13,11 +13,19 @@
 #
 # See templates/multi-repo/README.md and the "Multi-Repo Development" section
 # of DEVCONTAINER.md for the full explanation of how/why this works.
+#
+# ORDERING MATTERS: the IntelliJ module wiring (and sibling clones) run FIRST,
+# then the base single-repo setup runs LAST. The base setup can do a slow npx
+# preinstall (minutes, through a proxy); if it runs first, setup_jetbrains_modules
+# gets queued behind it and the IDE can open + scan before the module files
+# exist, so siblings never show. Front-loading the fast module setup makes the
+# .idea files exist before the IDE backend starts.
 # ============================================================================
 set -e
 
-# Run the base single-repo setup first (AI config projection, cert fixes, etc.).
-.devcontainer/post-create.sh
+# git safe.directory — sibling repos are owned by a different UID; needed before
+# any git op on them (base sets this too, but base now runs last).
+sudo git config --system --add safe.directory '*' 2>/dev/null || true
 
 # ----------------------------------------------------------------------------
 # Clone any sibling repos whose mounts came up empty on first boot — either a
@@ -58,12 +66,13 @@ clone_if_missing /workspace/repo-c https://github.com/OWNER/repo-c.git
 # sibling entries. The per-sibling .iml uses a presence guard (self-contained,
 # nothing to merge).
 # ----------------------------------------------------------------------------
-setup_intellij_modules() {
+setup_jetbrains_modules() {
     # EDIT: this (primary) repo's own name — the repo whose .devcontainer you open.
     local idea_dir="/workspace/repo-a/.idea"
     mkdir -p "$idea_dir"
 
     # EDIT: siblings that have their own pom.xml (Maven) vs. everything else.
+    # If none of your repos use Maven, leave maven_siblings empty.
     local maven_siblings=(repo-b)
     local plain_siblings=(repo-c)
 
@@ -100,27 +109,36 @@ def load_or_create(path):
     root = ET.fromstring('<project version="4"></project>')
     return ET.ElementTree(root), root
 
-# misc.xml has real pre-existing content (JDK name, external storage config)
-# that must survive — patch it, don't overwrite it.
-if maven_siblings:
+# misc.xml: (1) disable IntelliJ external storage — with it ON (IntelliJ's
+# default) the IDE consumes .idea/modules.xml on import and then fails to
+# render non-Maven sibling modules; OFF keeps modules.xml authoritative
+# (verified fix). (2) patch in Maven siblings. Pre-existing content (JDK etc.)
+# is preserved — patch, don't overwrite.
+if maven_siblings or plain_siblings:
     misc_path = os.path.join(idea_dir, "misc.xml")
     tree, root = load_or_create(misc_path)
 
-    mpm = root.find("./component[@name='MavenProjectsManager']")
-    if mpm is None:
-        mpm = ET.SubElement(root, "component", {"name": "MavenProjectsManager"})
-    option = mpm.find("./option[@name='originalFiles']")
-    if option is None:
-        option = ET.SubElement(mpm, "option", {"name": "originalFiles"})
-    lst = option.find("./list")
-    if lst is None:
-        lst = ET.SubElement(option, "list")
+    ext = root.find("./component[@name='ExternalStorageConfigurationManager']")
+    if ext is None:
+        ext = ET.SubElement(root, "component", {"name": "ExternalStorageConfigurationManager"})
+    ext.set("enabled", "false")
 
-    existing = {opt.get("value") for opt in lst.findall("option")}
-    for sibling in maven_siblings:
-        value = f"$PROJECT_DIR$/../{sibling}/pom.xml"
-        if value not in existing:
-            ET.SubElement(lst, "option", {"value": value})
+    if maven_siblings:
+        mpm = root.find("./component[@name='MavenProjectsManager']")
+        if mpm is None:
+            mpm = ET.SubElement(root, "component", {"name": "MavenProjectsManager"})
+        option = mpm.find("./option[@name='originalFiles']")
+        if option is None:
+            option = ET.SubElement(mpm, "option", {"name": "originalFiles"})
+        lst = option.find("./list")
+        if lst is None:
+            lst = ET.SubElement(option, "list")
+
+        existing = {opt.get("value") for opt in lst.findall("option")}
+        for sibling in maven_siblings:
+            value = f"$PROJECT_DIR$/../{sibling}/pom.xml"
+            if value not in existing:
+                ET.SubElement(lst, "option", {"value": value})
 
     ET.indent(tree, space="  ")
     tree.write(misc_path, encoding="UTF-8", xml_declaration=True)
@@ -149,7 +167,11 @@ if plain_siblings:
     tree2.write(modules_path, encoding="UTF-8", xml_declaration=True)
 PYEOF
 
-    echo "IntelliJ: linked Maven siblings [${maven_siblings[*]}], registered module siblings [${plain_siblings[*]}]"
+    echo "JetBrains: linked Maven siblings [${maven_siblings[*]}], registered module siblings [${plain_siblings[*]}]"
 }
 
-setup_intellij_modules
+setup_jetbrains_modules
+
+# Base single-repo setup LAST — see the ordering note at the top of this file.
+# Its slow npx preinstall must not delay the IDE module wiring above.
+.devcontainer/post-create.sh

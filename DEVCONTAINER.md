@@ -107,14 +107,14 @@ Keeping every repo as a direct child of `/workspace` (never one level deeper, in
 
 #### Auto-cloning into empty mounts
 
-`bind` mode requires the repo already cloned on the host — by default at the sibling-relative path, or wherever `DEVCONTAINER_REPO_B_PATH` points if set. `volume` mode starts out as an empty, container-local volume with nothing in it. Rather than document a manual clone step for either case, add a `.devcontainer/multi-repo/post-create.sh` that runs the default config's setup first, then clones into whichever related-repo mounts are still empty:
+`bind` mode requires the repo already cloned on the host — by default at the sibling-relative path, or wherever `DEVCONTAINER_REPO_B_PATH` points if set. `volume` mode starts out as an empty, container-local volume with nothing in it. Rather than document a manual clone step for either case, add a `.devcontainer/multi-repo/post-create.sh` that clones into whichever related-repo mounts are still empty and then runs the default config's setup **last**:
 
 ```bash
 #!/bin/bash
 set -e
 
-# Same setup as the default single-repo config.
-.devcontainer/post-create.sh
+# git safe.directory — sibling repos are owned by a different UID.
+sudo git config --system --add safe.directory '*' 2>/dev/null || true
 
 clone_if_missing() {
     local dir="$1" url="$2"
@@ -125,7 +125,17 @@ clone_if_missing() {
 }
 
 clone_if_missing /workspace/repo-b https://github.com/<org>/repo-b.git
+
+# ... setup_jetbrains_modules here (see the JetBrains section below) ...
+
+# Base single-repo setup runs LAST. It can do a slow npx preinstall (minutes,
+# through a proxy); if it ran first, the fast module wiring above would be queued
+# behind it and the IDE could open + scan before the .idea files exist, so
+# JetBrains siblings would never appear. Front-loading the module setup avoids that.
+.devcontainer/post-create.sh
 ```
+
+> **Ordering matters for JetBrains.** The base `post-create.sh` is heavy (npx preinstall can take minutes). If it runs *first*, IntelliJ's backend can start and scan the project before the module-registration files exist — so the siblings silently never show. Always write the `.idea` module files (and clone siblings) **before** calling the base setup. (VS Code/Cursor read the `.code-workspace` live and don't care about this ordering.)
 
 Point `postCreateCommand` at this script instead of the default one:
 
@@ -153,7 +163,7 @@ This makes the multi-repo variant's feature set deliberately *heavier* than any 
 Extend the same `.devcontainer/multi-repo/post-create.sh` from [Auto-cloning into empty mounts](#auto-cloning-into-empty-mounts) above with a function that generates both, keyed off which siblings are Maven-based vs. not:
 
 ```bash
-setup_intellij_modules() {
+setup_jetbrains_modules() {
     local idea_dir="/workspace/repo-a/.idea"
     mkdir -p "$idea_dir"
 
@@ -193,27 +203,36 @@ def load_or_create(path):
     root = ET.fromstring('<project version="4"></project>')
     return ET.ElementTree(root), root
 
-# misc.xml has real pre-existing content (JDK name, external storage config)
-# that must survive — patch it, don't overwrite it.
-if maven_siblings:
+# misc.xml: (1) disable IntelliJ external storage — with it ON (IntelliJ's
+# default) the IDE consumes .idea/modules.xml on import and then fails to
+# render non-Maven sibling modules; OFF keeps modules.xml authoritative
+# (verified fix). (2) patch in Maven siblings. Pre-existing content (JDK etc.)
+# is preserved — patch, don't overwrite.
+if maven_siblings or plain_siblings:
     misc_path = os.path.join(idea_dir, "misc.xml")
     tree, root = load_or_create(misc_path)
 
-    mpm = root.find("./component[@name='MavenProjectsManager']")
-    if mpm is None:
-        mpm = ET.SubElement(root, "component", {"name": "MavenProjectsManager"})
-    option = mpm.find("./option[@name='originalFiles']")
-    if option is None:
-        option = ET.SubElement(mpm, "option", {"name": "originalFiles"})
-    lst = option.find("./list")
-    if lst is None:
-        lst = ET.SubElement(option, "list")
+    ext = root.find("./component[@name='ExternalStorageConfigurationManager']")
+    if ext is None:
+        ext = ET.SubElement(root, "component", {"name": "ExternalStorageConfigurationManager"})
+    ext.set("enabled", "false")
 
-    existing = {opt.get("value") for opt in lst.findall("option")}
-    for sibling in maven_siblings:
-        value = f"$PROJECT_DIR$/../{sibling}/pom.xml"
-        if value not in existing:
-            ET.SubElement(lst, "option", {"value": value})
+    if maven_siblings:
+        mpm = root.find("./component[@name='MavenProjectsManager']")
+        if mpm is None:
+            mpm = ET.SubElement(root, "component", {"name": "MavenProjectsManager"})
+        option = mpm.find("./option[@name='originalFiles']")
+        if option is None:
+            option = ET.SubElement(mpm, "option", {"name": "originalFiles"})
+        lst = option.find("./list")
+        if lst is None:
+            lst = ET.SubElement(option, "list")
+
+        existing = {opt.get("value") for opt in lst.findall("option")}
+        for sibling in maven_siblings:
+            value = f"$PROJECT_DIR$/../{sibling}/pom.xml"
+            if value not in existing:
+                ET.SubElement(lst, "option", {"value": value})
 
     ET.indent(tree, space="  ")
     tree.write(misc_path, encoding="UTF-8", xml_declaration=True)
@@ -243,7 +262,7 @@ if plain_siblings:
 PYEOF
 }
 
-setup_intellij_modules
+setup_jetbrains_modules
 ```
 
 `misc.xml` and `modules.xml` are both **patched, not overwritten** — the Python step parses whatever's already there (or starts a minimal skeleton if the file doesn't exist yet) and only adds entries that aren't already present, checking existing `<option value=...>`/`<module filepath=...>` values before appending. This matters because a repo can already have a real, non-devcontainer `.idea/` sitting on disk from before this setup ever ran (both files are typically gitignored, so this is host-local state, not something git tracks) — a plain `[ ! -f modules.xml ]` skip-if-exists guard would silently never add the sibling entries in that case, even though the per-sibling `.iml` files themselves get created fine. Only the per-sibling `.iml` files use a presence guard (`[ ! -f "$iml_path" ]`) — each one is self-contained with no pre-existing content worth merging, so simple skip-if-exists is fine there.
