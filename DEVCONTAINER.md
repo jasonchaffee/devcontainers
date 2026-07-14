@@ -48,7 +48,7 @@ Copy your existing config into `.devcontainer/multi-repo/devcontainer.json` and 
 
 `${localWorkspaceFolder}/..` is just "the parent of the repo you're opening" — no need to hardcode a home directory or org name, and it works regardless of what each developer's clone root is named. This only works if `repo-a`'s siblings genuinely share that same parent; if they don't, use Option 2 below instead.
 
-Then add a `.code-workspace` file (VS Code / Cursor) listing each sibling as a folder root, so all repos are visible and editable side by side in one window:
+Then add a `.code-workspace` file (VS Code / Cursor / Antigravity) listing each sibling as a folder root, so all repos are visible and editable side by side in one window:
 
 ```json
 {
@@ -84,7 +84,7 @@ Two independent env-var toggles here, both using [`${localEnv:VAR:default}`](htt
 
 Both vars are prefixed `DEVCONTAINER_` on purpose, not just `REPO_B_*`: `${localEnv:...}` only resolves from your host environment, and GUI-launched IDEs (opened from Dock/Spotlight, not a terminal) don't automatically inherit your shell's exported variables on macOS — they need to be synced into `launchctl setenv` separately. If your setup does that sync with a script, matching every mount override to one `DEVCONTAINER_` prefix means the sync script can forward *any* variable starting with `DEVCONTAINER_` generically, instead of needing an edit every time a new repo combo adds new variable names.
 
-Add a `.code-workspace` file listing each `/workspace/*` path as a folder root for a proper multi-root editor view:
+Add a `.code-workspace` file (VS Code / Cursor / Antigravity) listing each `/workspace/*` path as a folder root for a proper multi-root editor view:
 
 ```json
 {
@@ -141,9 +141,106 @@ The fix is to add the *other* repos' missing features directly to the multi-repo
 
 This makes the multi-repo variant's feature set deliberately *heavier* than any single-repo default — which is itself a reason to keep it a separate named config rather than merging into any one repo's default: forcing every single-repo session to carry a combined toolchain it doesn't need is real, avoidable bloat.
 
+### JetBrains (IntelliJ) — sibling modules instead of a workspace file
+
+`.code-workspace` is a VS Code/Cursor/Antigravity concept — JetBrains has no equivalent multi-root workspace feature for a project opened via Gateway + Dev Containers (only JetBrains **Fleet**, a separate IDE, has a real "attach multiple folders" capability). To get the related repos to show up in the Project tree at all, register each one as a **module** instead. There's no documented recipe for this exact scenario, so the mechanism below was reverse-engineered by comparing what IntelliJ itself writes to disk when you manually add a sibling via `File > New > Module from Existing Sources`, and it depends on whether the sibling has a recognized build system:
+
+- **Sibling with its own `pom.xml` (Maven)** — add it to *this* project's `.idea/misc.xml`, under `MavenProjectsManager`'s `originalFiles` list. IntelliJ's own Maven integration then generates the real module/dependency structure — no hand-authored `.iml` needed.
+- **Sibling with no recognized build system** — IntelliJ instead expects a plain `.iml` (type `WEB_MODULE`) placed **inside that sibling's own root directory** (not centralized in this project's `.idea/`), referenced from this project's `.idea/modules.xml`. This project's own module is never self-referenced in `modules.xml` — only the *attached* siblings appear there.
+
+Extend the same `.devcontainer/multi-repo/post-create.sh` from [Auto-cloning into empty mounts](#auto-cloning-into-empty-mounts) above with a function that generates both, keyed off which siblings are Maven-based vs. not:
+
+```bash
+setup_intellij_modules() {
+    local idea_dir="/workspace/repo-a/.idea"
+    mkdir -p "$idea_dir"
+
+    local maven_siblings=(repo-b)   # has its own pom.xml
+    local plain_siblings=(repo-c)   # no recognized build system
+
+    # misc.xml has real pre-existing content (JDK name, external storage
+    # config) that must survive — patch it, don't overwrite it.
+    python3 - "$idea_dir" "${maven_siblings[@]}" <<'PYEOF'
+import sys, os
+import xml.etree.ElementTree as ET
+
+idea_dir = sys.argv[1]
+maven_siblings = sys.argv[2:]
+if not maven_siblings:
+    sys.exit(0)
+
+misc_path = os.path.join(idea_dir, "misc.xml")
+if os.path.exists(misc_path):
+    tree = ET.parse(misc_path)
+    root = tree.getroot()
+else:
+    root = ET.fromstring('<project version="4"></project>')
+    tree = ET.ElementTree(root)
+
+mpm = root.find("./component[@name='MavenProjectsManager']")
+if mpm is None:
+    mpm = ET.SubElement(root, "component", {"name": "MavenProjectsManager"})
+option = mpm.find("./option[@name='originalFiles']")
+if option is None:
+    option = ET.SubElement(mpm, "option", {"name": "originalFiles"})
+lst = option.find("./list")
+if lst is None:
+    lst = ET.SubElement(option, "list")
+
+existing = {opt.get("value") for opt in lst.findall("option")}
+for sibling in maven_siblings:
+    value = f"$PROJECT_DIR$/../{sibling}/pom.xml"
+    if value not in existing:
+        ET.SubElement(lst, "option", {"value": value})
+
+ET.indent(tree, space="  ")
+tree.write(misc_path, encoding="UTF-8", xml_declaration=True)
+PYEOF
+
+    for repo in "${plain_siblings[@]}"; do
+        local iml_path="/workspace/${repo}/${repo}.iml"
+        if [ ! -f "$iml_path" ]; then
+            cat > "$iml_path" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://\$MODULE_DIR\$" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
+EOF
+        fi
+    done
+
+    local modules_xml="${idea_dir}/modules.xml"
+    if [ ! -f "$modules_xml" ]; then
+        {
+            echo '<?xml version="1.0" encoding="UTF-8"?>'
+            echo '<project version="4">'
+            echo '  <component name="ProjectModuleManager">'
+            echo '    <modules>'
+            for repo in "${plain_siblings[@]}"; do
+                echo "      <module fileurl=\"file://\$PROJECT_DIR\$/../${repo}/${repo}.iml\" filepath=\"\$PROJECT_DIR\$/../${repo}/${repo}.iml\" />"
+            done
+            echo '    </modules>'
+            echo '  </component>'
+            echo '</project>'
+        } > "$modules_xml"
+    fi
+}
+
+setup_intellij_modules
+```
+
+Both writers are guarded (`[ ! -f ... ]`, and the Python patcher checks existing `<option value=...>` entries before adding) so re-running on a returning developer's own project state is a no-op. Watch out for one non-obvious failure mode: the guards check *presence*, not *content* — leftover `.iml`/`modules.xml` files from an unrelated manual test (e.g. adding these same modules once by hand in a local, non-devcontainer IntelliJ session, which writes host-relative paths) will satisfy the guard and silently block the correct, container-relative version from ever being written. If sibling modules don't show up and the script looks right, check whether stale files already exist at those paths before assuming the script didn't run.
+
+**Known caveat:** on a container whose IDE backend is *already running* when these files are corrected, IntelliJ doesn't pick the change up automatically — `modules.xml` needs **Invalidate Caches / Restart**, and the `misc.xml` Maven entry needs an explicit **Reload All Maven Projects** (Maven tool window). Neither has been confirmed necessary on a genuinely fresh, never-before-opened container (where these files are already correct before Gateway's backend starts for the first time) — IntelliJ's normal first-open behavior is to scan and import automatically, so the manual nudge may only be an artifact of fixing files out from under an already-initialized backend. Treat the manual step as a fallback, not a given, until that's verified.
+
 ### Which to use
 
-Both give a true multi-root editor view (all repos as first-class folders via a `.code-workspace` file), and neither touches `workspaceMount`/`workspaceFolder` for the primary repo — only the disk layout differs:
+Both give a true multi-root editor view in VS Code/Cursor/Antigravity (all repos as first-class folders via a `.code-workspace` file), and neither touches `workspaceMount`/`workspaceFolder` for the primary repo — only the disk layout differs. In JetBrains, both still need the [sibling-module setup above](#jetbrains-intellij--sibling-modules-instead-of-a-workspace-file) regardless of which option you pick, since that's a separate mechanism from the mount strategy:
 
 | | Option 1 (parent mount) | Option 2 (per-repo `mounts`) |
 |---|---|---|
@@ -164,7 +261,8 @@ Set up the multi-repo variant as a separate named configuration rather than hand
 
 Switching is then just picking the other configuration and rebuilding — no JSON editing required:
 
-- **VS Code / Cursor:** "Dev Containers: Reopen in Container" shows a picker when more than one configuration exists.
+- **VS Code / Cursor / Antigravity:** "Dev Containers: Reopen in Container" shows a picker when more than one configuration exists.
+- **JetBrains:** Gateway's project picker shows each `.devcontainer/<folder>/devcontainer.json` as a separate entry.
 - **CLI:** target either config explicitly:
   ```bash
   devcontainer up --config .devcontainer/devcontainer.json               # single-repo
