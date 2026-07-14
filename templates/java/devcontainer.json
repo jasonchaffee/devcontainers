@@ -271,7 +271,10 @@
     "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached,readonly",
     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached,readonly",
     "source=${localEnv:HOME}/.m2,target=/home/vscode/.m2,type=bind,consistency=cached",
-    "source=${localWorkspaceFolderBasename}-target,target=/workspace/${localWorkspaceFolderBasename}/target,type=volume",
+    // No separate volume for target/ — it's a Docker mount point at that path,
+    // and mvn clean's rmdir of the whole build directory fails with "Device
+    // or resource busy" against a mount point. target/ lives on the regular
+    // bind-mounted workspace instead.
     "source=${localWorkspaceFolderBasename}-shellhistory,target=/commandhistory,type=volume",
     "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude-host,type=bind,consistency=cached,readonly",
     "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude-json-host,type=bind,consistency=cached,readonly",
