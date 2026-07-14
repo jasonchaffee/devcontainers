@@ -12,6 +12,8 @@ echo "Installing JetBrains IDE dependencies..."
 # - procps: Process utilities (provides ps command)
 # - libxext, libxrender, libxtst, libxi: X11 libraries for GUI rendering
 # - libfreetype6: Font rendering library
+# - gcompat: glibc compatibility shim — Alpine/musl only (JetBrains lists it as
+#   required; not applicable to glibc distros like Debian/Ubuntu/Fedora)
 
 if command -v apt-get &> /dev/null; then
     echo "Updating apt-get..."
@@ -35,7 +37,8 @@ elif command -v apk &> /dev/null; then
         libxrender \
         libxtst \
         libxi \
-        freetype
+        freetype \
+        gcompat
 elif command -v dnf &> /dev/null; then
     dnf install -y --allowerasing \
         curl \
