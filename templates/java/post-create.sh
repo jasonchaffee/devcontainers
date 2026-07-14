@@ -12,6 +12,11 @@ sudo mkdir -p ~/.cache
 sudo chown -R "$(whoami)" ~/.cache
 mkdir -p ~/.cache/zsh ~/.cache/zsh-utils
 
+# Maven build-output volume (see workspaceFolder/mounts below): Docker creates
+# named volumes as root-owned when the mount path doesn't already exist in the
+# image, which breaks `mvn clean`/`build-info` for the non-root vscode user.
+sudo chown -R "$(whoami)" "$(pwd)/target" 2>/dev/null || true
+
 # Project read-only host AI config homes into writable container-local copies.
 # Runtime data is excluded; durable state is linked back through .ai-writeback.
 RSYNC_OPTS=(-a)
