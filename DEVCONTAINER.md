@@ -158,45 +158,6 @@ setup_intellij_modules() {
     local maven_siblings=(repo-b)   # has its own pom.xml
     local plain_siblings=(repo-c)   # no recognized build system
 
-    # misc.xml has real pre-existing content (JDK name, external storage
-    # config) that must survive — patch it, don't overwrite it.
-    python3 - "$idea_dir" "${maven_siblings[@]}" <<'PYEOF'
-import sys, os
-import xml.etree.ElementTree as ET
-
-idea_dir = sys.argv[1]
-maven_siblings = sys.argv[2:]
-if not maven_siblings:
-    sys.exit(0)
-
-misc_path = os.path.join(idea_dir, "misc.xml")
-if os.path.exists(misc_path):
-    tree = ET.parse(misc_path)
-    root = tree.getroot()
-else:
-    root = ET.fromstring('<project version="4"></project>')
-    tree = ET.ElementTree(root)
-
-mpm = root.find("./component[@name='MavenProjectsManager']")
-if mpm is None:
-    mpm = ET.SubElement(root, "component", {"name": "MavenProjectsManager"})
-option = mpm.find("./option[@name='originalFiles']")
-if option is None:
-    option = ET.SubElement(mpm, "option", {"name": "originalFiles"})
-lst = option.find("./list")
-if lst is None:
-    lst = ET.SubElement(option, "list")
-
-existing = {opt.get("value") for opt in lst.findall("option")}
-for sibling in maven_siblings:
-    value = f"$PROJECT_DIR$/../{sibling}/pom.xml"
-    if value not in existing:
-        ET.SubElement(lst, "option", {"value": value})
-
-ET.indent(tree, space="  ")
-tree.write(misc_path, encoding="UTF-8", xml_declaration=True)
-PYEOF
-
     for repo in "${plain_siblings[@]}"; do
         local iml_path="/workspace/${repo}/${repo}.iml"
         if [ ! -f "$iml_path" ]; then
@@ -214,27 +175,78 @@ EOF
         fi
     done
 
-    local modules_xml="${idea_dir}/modules.xml"
-    if [ ! -f "$modules_xml" ]; then
-        {
-            echo '<?xml version="1.0" encoding="UTF-8"?>'
-            echo '<project version="4">'
-            echo '  <component name="ProjectModuleManager">'
-            echo '    <modules>'
-            for repo in "${plain_siblings[@]}"; do
-                echo "      <module fileurl=\"file://\$PROJECT_DIR\$/../${repo}/${repo}.iml\" filepath=\"\$PROJECT_DIR\$/../${repo}/${repo}.iml\" />"
-            done
-            echo '    </modules>'
-            echo '  </component>'
-            echo '</project>'
-        } > "$modules_xml"
-    fi
+    python3 - "$idea_dir" "${#maven_siblings[@]}" "${maven_siblings[@]}" "${plain_siblings[@]}" <<'PYEOF'
+import sys, os
+import xml.etree.ElementTree as ET
+
+idea_dir = sys.argv[1]
+n_maven = int(sys.argv[2])
+maven_siblings = sys.argv[3:3 + n_maven]
+plain_siblings = sys.argv[3 + n_maven:]
+
+def load_or_create(path):
+    if os.path.exists(path):
+        tree = ET.parse(path)
+        return tree, tree.getroot()
+    root = ET.fromstring('<project version="4"></project>')
+    return ET.ElementTree(root), root
+
+# misc.xml has real pre-existing content (JDK name, external storage config)
+# that must survive — patch it, don't overwrite it.
+if maven_siblings:
+    misc_path = os.path.join(idea_dir, "misc.xml")
+    tree, root = load_or_create(misc_path)
+
+    mpm = root.find("./component[@name='MavenProjectsManager']")
+    if mpm is None:
+        mpm = ET.SubElement(root, "component", {"name": "MavenProjectsManager"})
+    option = mpm.find("./option[@name='originalFiles']")
+    if option is None:
+        option = ET.SubElement(mpm, "option", {"name": "originalFiles"})
+    lst = option.find("./list")
+    if lst is None:
+        lst = ET.SubElement(option, "list")
+
+    existing = {opt.get("value") for opt in lst.findall("option")}
+    for sibling in maven_siblings:
+        value = f"$PROJECT_DIR$/../{sibling}/pom.xml"
+        if value not in existing:
+            ET.SubElement(lst, "option", {"value": value})
+
+    ET.indent(tree, space="  ")
+    tree.write(misc_path, encoding="UTF-8", xml_declaration=True)
+
+# modules.xml may already exist too (e.g. a repo with its own prior,
+# non-devcontainer .idea/ on disk) — patch it the same way as misc.xml
+# above; never skip just because the file is already there.
+if plain_siblings:
+    modules_path = os.path.join(idea_dir, "modules.xml")
+    tree2, root2 = load_or_create(modules_path)
+
+    pmm = root2.find("./component[@name='ProjectModuleManager']")
+    if pmm is None:
+        pmm = ET.SubElement(root2, "component", {"name": "ProjectModuleManager"})
+    modules_list = pmm.find("./modules")
+    if modules_list is None:
+        modules_list = ET.SubElement(pmm, "modules")
+
+    existing2 = {m.get("filepath") for m in modules_list.findall("module")}
+    for sibling in plain_siblings:
+        filepath = f"$PROJECT_DIR$/../{sibling}/{sibling}.iml"
+        if filepath not in existing2:
+            ET.SubElement(modules_list, "module", {"fileurl": f"file://{filepath}", "filepath": filepath})
+
+    ET.indent(tree2, space="  ")
+    tree2.write(modules_path, encoding="UTF-8", xml_declaration=True)
+PYEOF
 }
 
 setup_intellij_modules
 ```
 
-Both writers are guarded (`[ ! -f ... ]`, and the Python patcher checks existing `<option value=...>` entries before adding) so re-running on a returning developer's own project state is a no-op. Watch out for one non-obvious failure mode: the guards check *presence*, not *content* — leftover `.iml`/`modules.xml` files from an unrelated manual test (e.g. adding these same modules once by hand in a local, non-devcontainer IntelliJ session, which writes host-relative paths) will satisfy the guard and silently block the correct, container-relative version from ever being written. If sibling modules don't show up and the script looks right, check whether stale files already exist at those paths before assuming the script didn't run.
+`misc.xml` and `modules.xml` are both **patched, not overwritten** — the Python step parses whatever's already there (or starts a minimal skeleton if the file doesn't exist yet) and only adds entries that aren't already present, checking existing `<option value=...>`/`<module filepath=...>` values before appending. This matters because a repo can already have a real, non-devcontainer `.idea/` sitting on disk from before this setup ever ran (both files are typically gitignored, so this is host-local state, not something git tracks) — a plain `[ ! -f modules.xml ]` skip-if-exists guard would silently never add the sibling entries in that case, even though the per-sibling `.iml` files themselves get created fine. Only the per-sibling `.iml` files use a presence guard (`[ ! -f "$iml_path" ]`) — each one is self-contained with no pre-existing content worth merging, so simple skip-if-exists is fine there.
+
+One related failure mode either way: since these guards (and the Python patcher's dedup) check *content*, not just *file presence*, a check that instead only checked *presence* would treat leftover `.iml`/`modules.xml`/`misc.xml` files from an unrelated manual test (e.g. adding these same modules once by hand in a local, non-devcontainer IntelliJ session, which writes host-relative paths) as "already done" and block the correct, container-relative version from ever being written. If sibling modules don't show up and the script looks right, check the actual file contents at those paths before assuming the script didn't run.
 
 **Known caveat:** on a container whose IDE backend is *already running* when these files are corrected, IntelliJ doesn't pick the change up automatically — `modules.xml` needs **Invalidate Caches / Restart**, and the `misc.xml` Maven entry needs an explicit **Reload All Maven Projects** (Maven tool window). Neither has been confirmed necessary on a genuinely fresh, never-before-opened container (where these files are already correct before Gateway's backend starts for the first time) — IntelliJ's normal first-open behavior is to scan and import automatically, so the manual nudge may only be an artifact of fixing files out from under an already-initialized backend. Treat the manual step as a fallback, not a given, until that's verified.
 
