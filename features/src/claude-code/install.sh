@@ -2,7 +2,7 @@
 set -e
 
 VERSION="${VERSION:-latest}"
-INSTALLSTATUSLINE="${INSTALLSTATUSLINE:-false}"
+INSTALLSTATUSLINE="${INSTALLSTATUSLINE:-true}"
 
 echo "Installing Claude Code CLI (version: ${VERSION})..."
 

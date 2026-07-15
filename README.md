@@ -10,18 +10,25 @@ See [DEVCONTAINER.md](DEVCONTAINER.md) for choosing a template, multi-repo devco
 ├── features/              # Dev container features
 │   ├── src/               # Feature source code
 │   │   ├── antidote/      # Zsh plugin manager
+│   │   ├── bun/           # Bun JavaScript runtime
 │   │   ├── claude-code/   # Claude Code CLI
 │   │   ├── codex/         # OpenAI Codex CLI
 │   │   ├── gemini-cli/    # Google Gemini CLI
 │   │   ├── gcloud-cli/    # Google Cloud CLI
+│   │   ├── linuxbrew/     # Homebrew on Linux
+│   │   ├── locust/        # Python load testing framework
 │   │   ├── modern-cli/    # Modern Unix tools (bat, eza, fd, ripgrep, etc.)
 │   │   ├── shell-dev/     # Shell development tools (shellcheck, tldr)
 │   │   ├── http-tools/    # HTTP clients (xh)
 │   │   ├── terminal-extras/  # Terminal utilities (tmux, btop, viddy)
+│   │   ├── uv/             # Fast Python package/project manager
 │   │   └── jetbrains/     # JetBrains IDE support
 │   └── test/              # Feature tests
 └── templates/             # Dev container templates
-    └── java/              # Java template
+    ├── java/              # Java template
+    ├── python/            # Python template
+    ├── node/              # Node.js/TypeScript template
+    └── multi-repo/        # Multi-repo overlay (mounts sibling repos)
 ```
 
 ## Quick Start
@@ -45,8 +52,8 @@ Each feature in `features/` can be used independently in any devcontainer.json:
 ```jsonc
 {
   "features": {
-    "ghcr.io/<org>/devcontainer-features/modern-cli:1": {},
-    "ghcr.io/<org>/devcontainer-features/claude-code:1": {
+    "ghcr.io/jasonchaffee/devcontainers/modern-cli:1": {},
+    "ghcr.io/jasonchaffee/devcontainers/claude-code:1": {
       "installStatusLine": true
     }
   }
@@ -69,7 +76,6 @@ Each feature in `features/` can be used independently in any devcontainer.json:
 | `locust` | Python load testing framework |
 | `modern-cli` | bat, eza, fd, ripgrep, zoxide, delta, fzf, yq |
 | `shell-dev` | shellcheck, tldr |
-| `skaffold` | Skaffold for local Kubernetes development |
 | `spring` | Spring Boot tools (VS Code/IntelliJ extensions, optional Spring CLI) |
 | `terminal-extras` | tmux, btop, viddy, ttyd |
 | `uv` | Fast Python package and project manager (Astral) |
@@ -164,7 +170,7 @@ devcontainer features test -p features/ -i fedora:latest
 Skip scenario tests (use only the base image you specify):
 
 ```bash
-devcontainer features test -p features/ -i pp-devcontainer:latest --skip-scenarios
+devcontainer features test -p features/ -i devcontainers:latest --skip-scenarios
 ```
 
 Test scenario variations (defined in `features/test/<name>/scenarios.json`):

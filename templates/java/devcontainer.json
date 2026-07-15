@@ -115,11 +115,6 @@
     // "ghcr.io/jasonchaffee/devcontainers/jmeter:1": {}
 
     // =========================================================================
-    // Optional: Skaffold for local Kubernetes development
-    // =========================================================================
-    // "ghcr.io/jasonchaffee/devcontainers/skaffold:1": {},
-
-    // =========================================================================
     // Optional: Terraform (installTerraform: false)
     // =========================================================================
     // "ghcr.io/devcontainers/features/terraform:1": {}

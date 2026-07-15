@@ -58,8 +58,7 @@ Templates SHOULD include by default:
 
 Templates SHOULD list as optional (commented-out) features:
 - `gemini-cli` (optional AI tool)
-- `gcloud-cli` (optional cloud tooling)
-- `skaffold` (optional Kubernetes dev tool)
+- `gcloud-cli` (optional cloud tooling; its `installSkaffold` option covers Skaffold)
 - `spring`, `jmeter`, `locust`, `k6` (domain-specific optional tools)
 - `jetbrains` (IDE-specific)
 
@@ -92,7 +91,6 @@ portability across base images, unless a feature explicitly declares itself Ubun
 | `locust` | Python load testing framework |
 | `modern-cli` | bat, eza, fd, ripgrep, zoxide, delta, fzf, yq |
 | `shell-dev` | shellcheck, bats |
-| `skaffold` | Skaffold for local Kubernetes development |
 | `spring` | Spring Boot VS Code/IntelliJ extensions |
 | `terminal-extras` | tmux, btop, viddy, ttyd, tldr |
 | `uv` | Fast Python package manager (Astral) |
