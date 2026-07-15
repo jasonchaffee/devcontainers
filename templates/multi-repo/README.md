@@ -25,6 +25,24 @@ For the full rationale (why `/workspace/<repo>` layout, the two mount strategies
 3. **`post-create.sh`** — edit the two `EDIT:` spots: the `clone_if_missing` calls (one per sibling, with its clone URL) and, in `setup_intellij_modules`, the `idea_dir` (your primary repo name) plus `maven_siblings` (siblings that have their own `pom.xml`) vs. `plain_siblings` (everything else). If none of your repos use Maven, leave `maven_siblings` empty and list them all under `plain_siblings`.
 4. **`example.code-workspace`** — list every repo as a `/workspace/<name>` folder; rename it to something meaningful.
 
+## Compose-backed overlays
+
+If both the default and multi-repo configurations use Docker Compose, give the overlay its own Compose project name. The JSON `"name"` is only an IDE label; without an explicit Compose name, both configurations fall back to `<workspace-folder>_devcontainer` and collide in Rancher/Docker Desktop.
+
+Keep shared services in `.devcontainer/docker-compose.yml`, add a name-only `.devcontainer/multi-repo/docker-compose.yml`:
+
+```yaml
+name: repo-a_multi_repo_devcontainer
+```
+
+and layer both files from the overlay's `devcontainer.json`:
+
+```json
+"dockerComposeFile": ["../docker-compose.yml", "docker-compose.yml"]
+```
+
+If the overlay already has its own complete Compose file, add the top-level `name:` there instead. See [Docker Compose — isolate each named configuration](../../DEVCONTAINER.md#docker-compose--isolate-each-named-configuration) for the naming rules, validation command, and cleanup behavior.
+
 ## Switching in and out
 
 Both the base and multi-repo configs are named configurations, so switching is just picking the other one and **rebuilding** (mounts are fixed at container creation — a restart won't change them). Nothing is destroyed: everything is bind-mounted from the host.

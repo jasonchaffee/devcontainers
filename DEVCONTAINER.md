@@ -28,6 +28,57 @@ By default, a devcontainer mounts and opens exactly one repo — the one whose `
 
 Both approaches below are part of the [official Dev Containers specification](https://containers.dev/implementors/spec) — no custom tooling required.
 
+### Docker Compose — isolate each named configuration
+
+A devcontainer's JSON `"name"` only labels the configuration in the IDE. It does **not** set the Docker Compose project name. When multiple configurations in the same repo use Compose and no project name is configured, the Dev Containers CLI falls back to `<workspace-folder>_devcontainer`. Rancher Desktop and Docker Desktop then group every configuration under that same project; matching service names can be reused or recreated, and stopping one configuration can stop the other's services.
+
+Give every Compose-backed variant a distinct top-level Compose `name:`. When the default and alternate configurations share the same services, keep the service definitions in the default Compose file and add a name-only override for the alternate configuration:
+
+```text
+.devcontainer/
+├── devcontainer.json
+├── docker-compose.yml
+└── multi-repo/
+    ├── devcontainer.json
+    └── docker-compose.yml
+```
+
+The default configuration continues to use the base file:
+
+```json
+"dockerComposeFile": "docker-compose.yml"
+```
+
+The named variant layers its override after the shared file:
+
+```json
+"dockerComposeFile": ["../docker-compose.yml", "docker-compose.yml"]
+```
+
+The variant's `.devcontainer/multi-repo/docker-compose.yml` only needs a unique project name:
+
+```yaml
+# Isolate this variant from the default devcontainer stack.
+name: repo-a_multi_repo_devcontainer
+```
+
+If the variant already owns a complete Compose file, add `name:` directly to that file instead. Use a lowercase name containing only letters, numbers, hyphens, and underscores. Do not rename the `service` merely to create isolation; the Compose project name is the intended namespace. `COMPOSE_PROJECT_NAME` also works, but it is process/environment-scoped and is easier to apply inconsistently than a version-controlled, per-configuration `name:`.
+
+Validate both the merged project name and the devcontainer configuration before rebuilding:
+
+```bash
+docker compose \
+  -f .devcontainer/docker-compose.yml \
+  -f .devcontainer/multi-repo/docker-compose.yml \
+  config --format json | jq -r '.name'
+
+devcontainer read-configuration \
+  --workspace-folder . \
+  --config .devcontainer/multi-repo/devcontainer.json
+```
+
+After adding or changing a project name, rebuild the variant. An already-running stack keeps its old project label until it is stopped and removed; confirm the result with `docker compose ls` or the `com.docker.compose.project` container label.
+
 ### Option 1 — Mount the parent directory (full multi-root)
 
 If the repos already live as siblings on disk (e.g. `~/Dev/<org>/repo-a`, `~/Dev/<org>/repo-b`), mount the parent folder instead of just one repo. The [spec](https://containers.dev/implementors/spec) notes this `workspaceMount` + `workspaceFolder` pairing is "crucial for monorepos... while working in specific sub-projects" — the same mechanism works for sibling repos, since each keeps its own `.git`.
