@@ -44,5 +44,15 @@ fi
 - **Version Updates:** When updating a feature version, ensure both `devcontainer-feature.json` and any version defaults in `templates/` or `scenarios.json` are updated accordingly.
 - **Dependency Management:** Prefer `dependsOn` in `devcontainer-feature.json` for shared utilities (like `common-utils`) rather than re-implementing logic in `install.sh`.
 
+## Repository Operating Facts
+
+- Architecture is features + templates only; no pre-built images. Features publish to `ghcr.io/jasonchaffee/devcontainers` via GitHub Actions on every push to `main` touching `features/src/**`.
+- Layout: `features/src/<name>/{devcontainer-feature.json,install.sh}`, `features/test/<name>/test.sh`, `templates/{java,python,node}/`, `proposals/<name>/` (active) and `proposals/archive/`.
+- Feature scripts SHOULD support apt, apk, and yum/dnf unless the feature declares itself Ubuntu-only.
+- Templates SHOULD include by default: `common-utils`, `modern-cli`, `shell-dev`, `terminal-extras`, `antidote`, `http-tools`, `github-cli`, `docker-outside-of-docker`, `claude-code`, `codex`, `uv`, plus the primary language runtime.
+- Templates SHOULD list as commented-out optional features: `gemini-cli`, `gcloud-cli` (its `installSkaffold` option covers Skaffold), `spring`, `jmeter`, `locust`, `k6`, `jetbrains`.
+- Every template MUST include a `remoteEnv` block forwarding via `${localEnv:NAME}`: `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_MODEL`, `DISABLE_AUTOUPDATER`, `CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS`, `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `GEMINI_API_KEY`, `GEMINI_BASE_URL`, `GOOGLE_CLOUD_PROJECT`, `GITHUB_TOKEN`. Use `GEMINI_API_KEY`, not `GOOGLE_API_KEY`.
+- Changes to template content policy, feature conventions, or tooling assignments go through `proposals/<name>/proposal.md`, then implement, then archive with shipped status.
+
 ## References
 - [README.md](README.md) - Structure, features, templates, testing, development guide
